@@ -402,7 +402,7 @@
             // Auto-fill saved address
             loadSavedAddress();
         });
-
+/*
         function loadCartItems() {
             const cart = Cart.getCart();
             const cartItems = document.getElementById('cartItems');
@@ -598,7 +598,91 @@
                 placeOrderBtn.disabled = false;
                 placeOrderBtn.innerHTML = '<span>Place Order</span><span id="totalAmount"></span>';
             }
+        }*/
+        async function placeOrder() {
+    var cart = JSON.parse(localStorage.getItem('glammora_cart') || '[]');
+    var user = getUser();
+    
+    if (!user) {
+        alert('Please login first');
+        window.location.href = 'login.html';
+        return;
+    }
+    
+    if (cart.length === 0) {
+        alert('Your cart is empty');
+        return;
+    }
+    
+    var fullName = document.querySelector('[name="fullName"]')?.value || '';
+    var phone = document.querySelector('[name="phone"]')?.value || user.phone;
+    var address = document.querySelector('[name="address"]')?.value || '';
+    var city = document.querySelector('[name="city"]')?.value || '';
+    var pincode = document.querySelector('[name="pincode"]')?.value || '';
+    var state = document.querySelector('[name="state"]')?.value || '';
+    
+    if (!fullName || !address || !city || !pincode) {
+        alert('Please fill all required fields');
+        return;
+    }
+    
+    var btn = document.getElementById('placeOrderBtn');
+    btn.textContent = 'Placing Order...';
+    btn.disabled = true;
+    
+    var subtotal = 0;
+    cart.forEach(function(item) {
+        subtotal += (item.discounted_price * item.quantity);
+    });
+    var delivery = subtotal > 999 ? 0 : 99;
+    var total = subtotal + delivery;
+    
+    var orderData = {
+        user_id: user.id,
+        user_phone: user.phone,
+        full_address: {
+            fullName: fullName,
+            phone: phone,
+            address: address,
+            city: city,
+            state: state,
+            pincode: pincode
+        },
+        items: cart,
+        subtotal: subtotal,
+        delivery_charge: delivery,
+        total_amount: total,
+        referral_code: localStorage.getItem('glammora_ref') || null,
+        payment_method: 'COD',
+        status: 'Pending',
+        created_at: new Date().toISOString()
+    };
+    
+    try {
+        var result = await supabase.from('orders').insert(orderData).select().single();
+        
+        if (result.error) {
+            console.error('Order error:', result.error);
+            alert('Failed: ' + result.error.message);
+            btn.textContent = 'Place Order';
+            btn.disabled = false;
+            return;
         }
+        
+        // Success only
+        localStorage.removeItem('glammora_cart');
+        localStorage.removeItem('glammora_ref');
+        
+        alert('Order placed successfully!');
+        window.location.href = 'profile.html';
+        
+    } catch(e) {
+        console.error('Error:', e);
+        alert('Something went wrong');
+        btn.textContent = 'Place Order';
+        btn.disabled = false;
+    }
+}
     </script>
 </body>
 </html>
