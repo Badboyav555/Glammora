@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Connection</title>
+</head>
+<body style="background:#0f0f12; color:white; font-family:Arial; padding:20px;">
+    <h2>Supabase Connection Test</h2>
+    <div id="result" style="margin-top:20px; padding:16px; background:#1a1a22; border-radius:12px;"></div>
+    
+    <!-- Load Supabase library FIRST -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Initialize Supabase -->
+    <script>
+        // Check if supabase library loaded
+        if (typeof supabase === 'undefined') {
+            document.getElementById('result').innerHTML = 'Error: Supabase library not loaded!';
+        } else {
+            document.getElementById('result').innerHTML = 'Library loaded. Creating client...';
+            
+            // Create client with YOUR credentials
+            const SUPABASE_URL = 'https://gbhglongaehgspeifovp.supabase.co';
+            const SUPABASE_ANON_KEY = 'sb_publishable_yMZYjsVqJ9RchfeI3uO1bQ_0g_s2mUi';
+            
+            try {
+                const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                // Test connection
+                db.from('users').select('count', { count: 'exact' }).then(function(response) {
+                    if (response.error) {
+                        document.getElementById('result').innerHTML = 
+                            '<p style="color:#f44336;">Connection Error: ' + response.error.message + '</p>' +
+                            '<p>Check: Table "users" exists? RLS enabled?</p>';
+                    } else {
+                        document.getElementById('result').innerHTML = 
+                            '<p style="color:#4caf50;">Connected Successfully!</p>' +
+                            '<p>Response: ' + JSON.stringify(response) + '</p>';
+                    }
+                }).catch(function(err) {
+                    document.getElementById('result').innerHTML = 
+                        '<p style="color:#f44336;">Failed: ' + err.message + '</p>';
+                });
+                
+            } catch(e) {
+                document.getElementById('result').innerHTML = 
+                    '<p style="color:#f44336;">Error: ' + e.message + '</p>';
+            }
+        }
+    </script>
+</body>
+</html>
