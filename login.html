@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Login - Glammora</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f0f12;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .box {
+            background: #1a1a22;
+            padding: 30px 20px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 380px;
+            border: 1px solid #d81b60;
+        }
+        .box h2 {
+            text-align: center;
+            color: #ff4d8d;
+            margin-bottom: 24px;
+            font-size: 1.8rem;
+        }
+        input {
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 14px;
+            background: #0f0f12;
+            border: 2px solid #333;
+            border-radius: 14px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+        input:focus { border-color: #d81b60; }
+        button {
+            width: 100%;
+            padding: 16px;
+            background: #d81b60;
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        button:active { opacity: 0.8; }
+        button.gray { background: #333; }
+        .msg { text-align: center; margin-top: 10px; font-size: 0.9rem; padding: 8px; border-radius: 8px; }
+        .msg.error { background: #f4433622; color: #f44336; }
+        .msg.success { background: #4caf5022; color: #4caf50; }
+        .hidden { display: none; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab {
+            flex: 1; padding: 12px; text-align: center;
+            background: #0f0f12; border-radius: 10px; cursor: pointer;
+            border: 2px solid #333; font-weight: bold;
+        }
+        .tab.active { border-color: #d81b60; color: #ff4d8d; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>GLAMMORA</h2>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('login')">Login</div>
+            <div class="tab" onclick="showTab('signup')">Sign Up</div>
+        </div>
+        
+        <form id="loginForm" onsubmit="return doLogin(event)">
+            <input type="tel" id="loginPhone" placeholder="Mobile Number" maxlength="10" required>
+            <input type="password" id="loginPass" placeholder="Password" required>
+            <button type="submit" id="loginBtn">Login</button>
+            <div class="msg error hidden" id="loginError"></div>
+        </form>
+        
+        <form id="signupForm" class="hidden" onsubmit="return doSignup(event)">
+            <input type="tel" id="signupPhone" placeholder="Mobile Number" maxlength="10" required>
+            <input type="password" id="signupPass" placeholder="Password (min 6 chars)" required>
+            <input type="password" id="signupPass2" placeholder="Confirm Password" required>
+            <button type="submit" id="signupBtn">Create Account</button>
+            <div class="msg error hidden" id="signupError"></div>
+            <div class="msg success hidden" id="signupSuccess"></div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        function showTab(tab) {
+            document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('signupForm').classList.add('hidden');
+            document.querySelectorAll('.msg').forEach(function(m) { m.classList.add('hidden'); });
+            
+            if (tab === 'login') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('loginForm').classList.remove('hidden');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('signupForm').classList.remove('hidden');
+            }
+        }
+        
+        async function doLogin(e) {
+            e.preventDefault();
+            
+            var phone = document.getElementById('loginPhone').value.trim();
+            var pass = document.getElementById('loginPass').value;
+            var btn = document.getElementById('loginBtn');
+            var err = document.getElementById('loginError');
+            
+            err.classList.add('hidden');
+            
+            if (phone.length !== 10) {
+                err.textContent = 'Enter valid 10-digit number';
+                err.classList.remove('hidden');
+                return false;
+            }
+            
+            btn.textContent = 'Please wait...';
+            btn.disabled = true;
+            
+            var result = await Auth.login(phone, pass);
+            
+            if (result.error) {
+                err.textContent = result.error;
+                err.classList.remove('hidden');
+                btn.textContent = 'Login';
+                btn.disabled = false;
+            } else {
+                btn.textContent = 'Success!';
+                setTimeout(function() {
+                    window.location.href = 'index.html';
+                }, 500);
+            }
+            
+            return false;
+        }
+        
+        async function doSignup(e) {
+            e.preventDefault();
+            
+            var phone = document.getElementById('signupPhone').value.trim();
+            var pass = document.getElementById('signupPass').value;
+            var pass2 = document.getElementById('signupPass2').value;
+            var btn = document.getElementById('signupBtn');
+            var err = document.getElementById('signupError');
+            var suc = document.getElementById('signupSuccess');
+            
+            err.classList.add('hidden');
+            suc.classList.add('hidden');
+            
+            if (phone.length !== 10) {
+                err.textContent = 'Enter valid 10-digit number';
+                err.classList.remove('hidden');
+                return false;
+            }
+            if (pass.length < 6) {
+                err.textContent = 'Password too short (min 6)';
+                err.classList.remove('hidden');
+                return false;
+            }
+            if (pass !== pass2) {
+                err.textContent = 'Passwords do not match';
+                err.classList.remove('hidden');
+                return false;
+            }
+            
+            btn.textContent = 'Please wait...';
+            btn.disabled = true;
+            
+            var result = await Auth.signup(phone, pass);
+            
+            if (result.error) {
+                err.textContent = result.error;
+                err.classList.remove('hidden');
+                btn.textContent = 'Create Account';
+                btn.disabled = false;
+            } else {
+                suc.textContent = 'Account created! Redirecting...';
+                suc.classList.remove('hidden');
+                btn.textContent = 'Done!';
+                setTimeout(function() {
+                    window.location.href = 'index.html';
+                }, 800);
+            }
+            
+            return false;
+        }
+    </script>
+</body>
+</html>
