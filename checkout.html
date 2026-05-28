@@ -567,7 +567,7 @@
                 document.getElementById('referralInfo').style.display = 'flex';
             }
         }
-
+/*
         async function placeOrder() {
             var cart = JSON.parse(localStorage.getItem('glammora_cart') || '[]');
             var user = getUser();
@@ -662,7 +662,99 @@
                 btn.textContent = 'Place Order';
                 btn.disabled = false;
             }
+        }*/
+        async function placeOrder() {
+    var cart = JSON.parse(localStorage.getItem('glammora_cart') || '[]');
+    var user = getUser();
+
+    if (!user) { window.location.href = 'login.html'; return; }
+    if (cart.length === 0) { showToast('Cart is empty', 'error'); return; }
+
+    var fullName = document.querySelector('[name="fullName"]').value.trim();
+    var phone = document.querySelector('[name="phone"]').value.trim();
+    var altPhone = document.querySelector('[name="alternatePhone"]').value.trim();
+    var address = document.querySelector('[name="address"]').value.trim();
+    var area = document.querySelector('[name="area"]').value.trim();
+    var landmark = document.querySelector('[name="landmark"]').value.trim();
+    var city = document.querySelector('[name="city"]').value.trim();
+    var state = document.querySelector('[name="state"]').value;
+    var pincode = document.querySelector('[name="pincode"]').value.trim();
+
+    if (!fullName || !phone || !address || !area || !city || !state || !pincode) {
+        showToast('Fill all required fields', 'error'); return;
+    }
+    if (phone.length !== 10 || isNaN(phone)) {
+        showToast('Enter valid phone', 'error'); return;
+    }
+    if (pincode.length !== 6 || isNaN(pincode)) {
+        showToast('Enter valid pincode', 'error'); return;
+    }
+
+    var btn = document.getElementById('placeOrderBtn');
+    btn.textContent = 'Placing...'; btn.disabled = true;
+
+    var subtotal = 0;
+    cart.forEach(function(item) { subtotal += (item.discounted_price * (item.quantity || 1)); });
+    var delivery = subtotal > 999 ? 0 : 99;
+    var total = subtotal + delivery;
+    var refCode = localStorage.getItem('glammora_ref') || null;
+
+    try {
+        var result = await supabase.from('orders').insert({
+            user_id: user.id,
+            user_phone: user.phone,
+            full_address: { fullName, phone, alternatePhone: altPhone, address, area, landmark, city, state, pincode, country: 'India' },
+            items: cart,
+            subtotal, delivery_charge: delivery, total_amount: total,
+            referral_code: refCode,
+            payment_method: 'COD', status: 'Pending',
+            created_at: new Date().toISOString()
+        }).select().single();
+
+        if (result.error) {
+            showToast('Failed: ' + result.error.message, 'error');
+            btn.textContent = 'Place Order'; btn.disabled = false;
+            return;
         }
+
+        // Track referral
+        if (refCode) {
+            // 1. Admin generated link tracking
+            var linkResult = await supabase.from('referral_links').select('*').eq('code', refCode).maybeSingle();
+            if (linkResult.data) {
+                var l = linkResult.data;
+                var linkCommission = (total * l.commission / 100);
+                await supabase.from('referral_links').update({
+                    orders: (l.orders || 0) + 1,
+                    earnings: (l.earnings || 0) + linkCommission
+                }).eq('id', l.id);
+            }
+
+            // 2. User referral tracking
+            var userResult = await supabase.from('users').select('*').eq('referral_code', refCode).maybeSingle();
+            if (userResult.data && userResult.data.id !== user.id) {
+                var refUser = userResult.data;
+                var userCommission = (total * 10 / 100);
+                await supabase.from('users').update({
+                    total_earnings: (refUser.total_earnings || 0) + userCommission,
+                    referral_count: (refUser.referral_count || 0) + 1
+                }).eq('id', refUser.id);
+                
+                await supabase.from('orders').update({ referred_by: refUser.id }).eq('id', result.data.id);
+            }
+        }
+
+        localStorage.removeItem('glammora_cart');
+        localStorage.removeItem('glammora_ref');
+        
+        showToast('Order placed!', 'success');
+        setTimeout(function() { window.location.href = 'profile.html'; }, 1000);
+
+    } catch(e) {
+        showToast('Error. Try again.', 'error');
+        btn.textContent = 'Place Order'; btn.disabled = false;
+    }
+                }
     </script>
 </body>
 </html>
