@@ -102,6 +102,111 @@
     <script src="js/supabase.js"></script>
     <script src="js/auth.js"></script>
     <script>
+        // Login Page Script
+function showTab(tab) {
+    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+    document.getElementById('loginForm').classList.add('hidden');
+    document.getElementById('signupForm').classList.add('hidden');
+    document.getElementById('loginError').classList.add('hidden');
+    document.getElementById('signupError').classList.add('hidden');
+    document.getElementById('signupSuccess').classList.add('hidden');
+    
+    if (tab === 'login') {
+        document.querySelectorAll('.tab')[0].classList.add('active');
+        document.getElementById('loginForm').classList.remove('hidden');
+    } else {
+        document.querySelectorAll('.tab')[1].classList.add('active');
+        document.getElementById('signupForm').classList.remove('hidden');
+    }
+}
+
+// Login
+async function doLogin(e) {
+    e.preventDefault();
+    
+    var phone = document.getElementById('loginPhone').value.trim();
+    var pass = document.getElementById('loginPass').value;
+    var btn = document.getElementById('loginBtn');
+    var err = document.getElementById('loginError');
+    
+    err.classList.add('hidden');
+    
+    if (phone.length !== 10) {
+        err.textContent = 'Enter valid 10-digit mobile number';
+        err.classList.remove('hidden');
+        return;
+    }
+    
+    btn.textContent = 'Please wait...';
+    btn.disabled = true;
+    
+    var result = await Auth.login(phone, pass);
+    console.log('Login result:', result);
+    
+    if (result.error) {
+        err.textContent = result.error;
+        err.classList.remove('hidden');
+        btn.textContent = 'Login';
+        btn.disabled = false;
+    } else {
+        btn.textContent = 'Success!';
+        setTimeout(function() {
+            window.location.href = 'index.html';
+        }, 500);
+    }
+}
+
+// Signup
+async function doSignup(e) {
+    e.preventDefault();
+    
+    var phone = document.getElementById('signupPhone').value.trim();
+    var pass = document.getElementById('signupPass').value;
+    var pass2 = document.getElementById('signupPass2').value;
+    var btn = document.getElementById('signupBtn');
+    var err = document.getElementById('signupError');
+    var suc = document.getElementById('signupSuccess');
+    
+    err.classList.add('hidden');
+    suc.classList.add('hidden');
+    
+    if (phone.length !== 10) {
+        err.textContent = 'Enter valid 10-digit mobile number';
+        err.classList.remove('hidden');
+        return;
+    }
+    if (pass.length < 6) {
+        err.textContent = 'Password must be at least 6 characters';
+        err.classList.remove('hidden');
+        return;
+    }
+    if (pass !== pass2) {
+        err.textContent = 'Passwords do not match';
+        err.classList.remove('hidden');
+        return;
+    }
+    
+    btn.textContent = 'Please wait...';
+    btn.disabled = true;
+    
+    var result = await Auth.signup(phone, pass);
+    console.log('Signup result:', result);
+    
+    if (result.error) {
+        err.textContent = result.error;
+        err.classList.remove('hidden');
+        btn.textContent = 'Create Account';
+        btn.disabled = false;
+    } else {
+        suc.textContent = 'Account created successfully!';
+        suc.classList.remove('hidden');
+        btn.textContent = 'Done!';
+        setTimeout(function() {
+            window.location.href = 'index.html';
+        }, 500);
+    }
+}
+        /*
         // Tab switching
         function showTab(tab) {
             document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
@@ -205,7 +310,7 @@
                     window.location.href = 'index.html';
                 }, 500);
             }
-        }
+        }*/
     </script>
 </body>
 </html>
