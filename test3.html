@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Test</title>
+    <style>
+        body { background: #0f0f12; color: white; font-family: Arial; padding: 20px; }
+        input { width: 100%; padding: 14px; margin: 8px 0; background: #1a1a22; border: 1px solid #333; border-radius: 10px; color: white; font-size: 16px; }
+        button { width: 100%; padding: 14px; background: #d81b60; border: none; border-radius: 10px; color: white; font-size: 16px; font-weight: bold; margin: 8px 0; }
+        .msg { padding: 12px; margin: 8px 0; border-radius: 10px; }
+        .error { background: #f4433622; color: #f44336; }
+        .success { background: #4caf5022; color: #4caf50; }
+        .info { background: #2196f322; color: #2196f3; }
+    </style>
+</head>
+<body>
+    <h2>Login Test</h2>
+    
+    <input type="tel" id="phone" placeholder="Mobile Number (10 digits)" maxlength="10">
+    <input type="password" id="pass" placeholder="Password (min 6 chars)">
+    
+    <button onclick="doSignup()">Sign Up</button>
+    <button onclick="doLogin()" style="background:#333;">Login</button>
+    
+    <div id="msg"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase Setup
+        const SUPABASE_URL = 'https://gbhglongaehgspeifovp.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_yMZYjsVqJ9RchfeI3uO1bQ_0g_s2mUi';
+        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        function showMsg(text, type) {
+            document.getElementById('msg').innerHTML = '<div class="msg ' + type + '">' + text + '</div>';
+        }
+        
+        async function doSignup() {
+            var phone = document.getElementById('phone').value.trim();
+            var pass = document.getElementById('pass').value;
+            
+            showMsg('Signing up...', 'info');
+            
+            if (phone.length !== 10) {
+                showMsg('Enter valid 10-digit number', 'error');
+                return;
+            }
+            if (pass.length < 6) {
+                showMsg('Password too short', 'error');
+                return;
+            }
+            
+            // Check existing
+            var check = await db.from('users').select('id').eq('phone', phone).maybeSingle();
+            
+            if (check.error) {
+                showMsg('Error: ' + check.error.message, 'error');
+                return;
+            }
+            
+            if (check.data) {
+                showMsg('Number already registered. Try login.', 'error');
+                return;
+            }
+            
+            // Create user
+            var ref = 'GLAM' + phone.slice(-4) + Math.random().toString(36).slice(2,5).toUpperCase();
+            var hash = btoa(pass);
+            
+            var result = await db.from('users').insert({
+                phone: phone,
+                password: hash,
+                referral_code: ref,
+                created_at: new Date().toISOString()
+            }).select().single();
+            
+            if (result.error) {
+                showMsg('Signup Failed: ' + result.error.message, 'error');
+            } else {
+                showMsg('Signup Successful! User ID: ' + result.data.id, 'success');
+                localStorage.setItem('user', JSON.stringify(result.data));
+            }
+        }
+        
+        async function doLogin() {
+            var phone = document.getElementById('phone').value.trim();
+            var pass = document.getElementById('pass').value;
+            var hash = btoa(pass);
+            
+            showMsg('Logging in...', 'info');
+            
+            var result = await db.from('users').select('*').eq('phone', phone).eq('password', hash).maybeSingle();
+            
+            if (result.error) {
+                showMsg('Error: ' + result.error.message, 'error');
+            } else if (!result.data) {
+                showMsg('Invalid phone or password', 'error');
+            } else {
+                showMsg('Login Successful! Welcome ' + result.data.phone, 'success');
+                localStorage.setItem('user', JSON.stringify(result.data));
+            }
+        }
+    </script>
+</body>
+</html>
