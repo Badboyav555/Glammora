@@ -9,6 +9,84 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        .image-slider {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+    background: #1a1a22;
+    border-radius: 0 0 20px 20px;
+}
+
+.slider-main {
+    display: flex;
+    height: 100%;
+    transition: transform 0.3s ease;
+    touch-action: pan-y pinch-zoom;
+}
+
+.slider-main img {
+    min-width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.slider-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    z-index: 5;
+}
+
+.slider-prev { left: 12px; }
+.slider-next { right: 12px; }
+
+.thumbnails {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    justify-content: center;
+}
+
+.thumbnails::-webkit-scrollbar { display: none; }
+
+.thumbnail {
+    width: 50px;
+    height: 65px;
+    border-radius: 8px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.3s;
+    flex-shrink: 0;
+    opacity: 0.6;
+}
+
+.thumbnail.active {
+    border-color: #d81b60;
+    opacity: 1;
+}
+
+@media (max-width: 480px) {
+    .image-slider {
+        height: 350px;
+    }
+}
+        /*
         .product-page {
             padding-bottom: 100px;
         }
@@ -77,7 +155,7 @@
         
         .thumbnail.active {
             border-color: var(--pink-primary);
-        }
+        }*/
         
         .product-details {
             padding: 20px;
