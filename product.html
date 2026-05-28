@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Product Details - Glammora</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .product-page {
+            padding-bottom: 100px;
+        }
+        
+        .image-slider {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+            background: var(--bg-secondary);
+        }
+        
+        .slider-main {
+            display: flex;
+            transition: transform 0.3s ease;
+            height: 100%;
+            touch-action: pan-y pinch-zoom;
+        }
+        
+        .slider-main img {
+            min-width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .slider-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .slider-prev { left: 16px; }
+        .slider-next { right: 16px; }
+        
+        .thumbnails {
+            display: flex;
+            gap: 8px;
+            padding: 12px 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        
+        .thumbnails::-webkit-scrollbar { display: none; }
+        
+        .thumbnail {
+            width: 60px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+        
+        .thumbnail.active {
+            border-color: var(--pink-primary);
+        }
+        
+        .product-details {
+            padding: 20px;
+        }
+        
+        .product-header {
+            margin-bottom: 16px;
+        }
+        
+        .product-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .product-description {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        
+        .price-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .final-price {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--pink-accent);
+        }
+        
+        .mrp-price {
+            color: var(--text-secondary);
+            text-decoration: line-through;
+            font-size: 1.1rem;
+        }
+        
+        .discount-percent {
+            background: rgba(216, 27, 96, 0.2);
+            color: var(--pink-accent);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        
+        .size-section {
+            margin-bottom: 24px;
+        }
+        
+        .size-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .size-chart-link {
+            color: var(--pink-accent);
+            font-size: 0.85rem;
+        }
+        
+        .size-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .size-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.2);
+            background: transparent;
+            color: var(--text-primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .size-btn.selected {
+            border-color: var(--pink-primary);
+            background: rgba(216, 27, 96, 0.2);
+            color: var(--pink-accent);
+        }
+        
+        .size-btn.out-of-stock {
+            opacity: 0.3;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+        
+        .delivery-section {
+            margin-bottom: 20px;
+        }
+        
+        .delivery-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .delivery-item i {
+            font-size: 1.2rem;
+            color: var(--pink-accent);
+            width: 24px;
+        }
+        
+        .delivery-item p {
+            font-size: 0.9rem;
+        }
+        
+        .delivery-item span {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .action-buttons {
+            position: fixed;
+            bottom: 70px;
+            left: 0;
+            right: 0;
+            padding: 16px 20px;
+            background: rgba(15, 15, 18, 0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            gap: 12px;
+            z-index: 50;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .btn-add-cart {
+            flex: 1;
+            background: transparent;
+            border: 2px solid var(--pink-primary);
+            color: var(--pink-primary);
+            padding: 16px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .btn-buy-now {
+            flex: 1;
+            background: var(--gradient-primary);
+            border: none;
+            color: white;
+            padding: 16px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow-pink);
+            transition: var(--transition);
+        }
+        
+        .btn-buy-now:active, .btn-add-cart:active {
+            transform: scale(0.96);
+        }
+        
+        .share-section {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .share-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+        
+        .share-btn:hover {
+            background: var(--pink-primary);
+        }
+        
+        .recommended-section {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Back Button -->
+    <div style="position: absolute; top: 20px; left: 20px; z-index: 10;">
+        <button onclick="history.back()" style="background: rgba(0,0,0,0.5); border: none; color: white; width: 44px; height: 44px; border-radius: 50%; font-size: 1.2rem; cursor: pointer;">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+    </div>
+
+    <!-- Wishlist Button -->
+    <div style="position: absolute; top: 20px; right: 20px; z-index: 10;">
+        <button id="wishlistToggleBtn" style="background: rgba(0,0,0,0.5); border: none; color: white; width: 44px; height: 44px; border-radius: 50%; font-size: 1.2rem; cursor: pointer;">
+            <i class="far fa-heart"></i>
+        </button>
+    </div>
+
+    <!-- Image Slider -->
+    <div class="image-slider" id="productSlider">
+        <div class="slider-main" id="sliderMain">
+            <!-- Images will be loaded dynamically -->
+        </div>
+        <button class="slider-nav slider-prev" onclick="navigateSlide(-1)">❮</button>
+        <button class="slider-nav slider-next" onclick="navigateSlide(1)">❯</button>
+    </div>
+
+    <!-- Thumbnails -->
+    <div class="thumbnails" id="thumbnails"></div>
+
+    <!-- Product Details -->
+    <div class="product-details">
+        <div class="product-header">
+            <h1 class="product-title" id="productTitle"></h1>
+            <p class="product-description" id="productDescription"></p>
+        </div>
+
+        <div class="price-section">
+            <span class="final-price" id="finalPrice"></span>
+            <span class="mrp-price" id="mrpPrice"></span>
+            <span class="discount-percent" id="discountPercent"></span>
+        </div>
+
+        <!-- Size Selection -->
+        <div class="size-section">
+            <div class="size-title">
+                <span>Select Size</span>
+                <a href="#" class="size-chart-link">Size Chart</a>
+            </div>
+            <div class="size-options" id="sizeOptions"></div>
+        </div>
+
+        <!-- Delivery Info -->
+        <div class="delivery-section">
+            <div class="delivery-item">
+                <i class="fas fa-truck"></i>
+                <div>
+                    <p>Free Delivery</p>
+                    <span>On orders above ₹999</span>
+                </div>
+            </div>
+            <div class="delivery-item">
+                <i class="fas fa-box"></i>
+                <div>
+                    <p>Cash on Delivery</p>
+                    <span>Available</span>
+                </div>
+            </div>
+            <div class="delivery-item">
+                <i class="fas fa-undo"></i>
+                <div>
+                    <p>Easy Returns</p>
+                    <span>7 days return policy</span>
+                </div>
+            </div>
+            <div class="delivery-item">
+                <i class="fas fa-clock"></i>
+                <div>
+                    <p>Estimated Delivery</p>
+                    <span>3-7 business days</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Share Buttons -->
+        <div class="share-section">
+            <button class="share-btn" onclick="shareProduct('whatsapp')">
+                <i class="fab fa-whatsapp"></i>
+            </button>
+            <button class="share-btn" onclick="shareProduct('facebook')">
+                <i class="fab fa-facebook-f"></i>
+            </button>
+            <button class="share-btn" onclick="shareProduct('twitter')">
+                <i class="fab fa-twitter"></i>
+            </button>
+            <button class="share-btn" onclick="shareProduct('copy')">
+                <i class="fas fa-link"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Recommended Products -->
+    <div class="recommended-section">
+        <h2 class="section-title">You May Also Like</h2>
+        <div class="products-grid" id="recommendedProducts"></div>
+    </div>
+
+    <!-- Sticky Action Buttons -->
+    <div class="action-buttons">
+        <button class="btn-add-cart" id="addToCartBtn">
+            <i class="fas fa-shopping-bag"></i> Add to Cart
+        </button>
+        <button class="btn-buy-now" id="buyNowBtn">
+            Buy Now
+        </button>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/products.js"></script>
+    <script src="js/cart.js"></script>
+    <script>
+        let currentProduct = null;
+        let currentSlide = 0;
+        let selectedSize = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id') || 1;
+            
+            await loadProduct(productId);
+            await loadRecommendedProducts();
+            updateWishlistStatus();
+        });
+
+        async function loadProduct(productId) {
+            try {
+                const { data, error } = await supabase
+                    .from('products')
+                    .select('*')
+                    .eq('id', productId)
+                    .single();
+
+                if (error) throw error;
+                
+                currentProduct = data;
+                renderProduct(data);
+                
+                // Recently viewed
+                addToRecentlyViewed(data);
+                
+            } catch (error) {
+                // Load sample product for demo
+                currentProduct = {
+                    id: 1,
+                    name: 'Embroidered Silk Kurta Set',
+                    description: 'Elegant silk kurta set with intricate embroidery work. Perfect for weddings and festive occasions.',
+                    category: 'ethnic',
+                    original_price: 2999,
+                    discounted_price: 1299,
+                    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+                    stock: 50,
+                    images: [
+                        'https://images.unsplash.com/photo-1610030181087-2e3915f28ff8?w=600',
+                        'https://images.unsplash.com/photo-1583391733956-3750e0f7ce7b?w=600',
+                        'https://images.unsplash.com/photo-1595341888016-a392ef81b7de?w=600',
+                        'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=600'
+                    ],
+                    cod_available: true
+                };
+                renderProduct(currentProduct);
+            }
+        }
+
+        function renderProduct(product) {
+            // Title & Description
+            document.getElementById('productTitle').textContent = product.name;
+            document.getElementById('productDescription').textContent = product.description || 'Premium quality fashion product';
+            
+            // Prices
+            document.getElementById('finalPrice').textContent = `₹${product.discounted_price.toLocaleString()}`;
+            document.getElementById('mrpPrice').textContent = `₹${product.original_price.toLocaleString()}`;
+            const discount = Math.round((1 - product.discounted_price / product.original_price) * 100);
+            document.getElementById('discountPercent').textContent = `${discount}% OFF`;
+            
+            // Image Slider
+            const sliderMain = document.getElementById('sliderMain');
+            const thumbnails = document.getElementById('thumbnails');
+            
+            sliderMain.innerHTML = product.images.map(img => 
+                `<img src="${img}" alt="${product.name}" loading="lazy">`
+            ).join('');
+            
+            thumbnails.innerHTML = product.images.map((img, index) => 
+                `<img src="${img}" alt="" class="thumbnail ${index === 0 ? 'active' : ''}" onclick="goToSlide(${index})" loading="lazy">`
+            ).join('');
+            
+            // Sizes
+            const sizeOptions = document.getElementById('sizeOptions');
+            sizeOptions.innerHTML = product.sizes.map(size => 
+                `<button class="size-btn" onclick="selectSize('${size}')" data-size="${size}">${size}</button>`
+            ).join('');
+            
+            // Swipe Gesture
+            initSwipeGesture();
+        }
+
+        function navigateSlide(direction) {
+            const totalSlides = currentProduct.images.length;
+            currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
+            goToSlide(currentSlide);
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            const sliderMain = document.getElementById('sliderMain');
+            sliderMain.style.transform = `translateX(-${index * 100}%)`;
+            
+            // Update thumbnails
+            document.querySelectorAll('.thumbnail').forEach((thumb, i) => {
+                thumb.classList.toggle('active', i === index);
+            });
+        }
+
+        function selectSize(size) {
+            selectedSize = size;
+            document.querySelectorAll('.size-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.size === size);
+            });
+        }
+
+        // Touch Swipe
+        function initSwipeGesture() {
+            const slider = document.getElementById('productSlider');
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            slider.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, {passive: true});
+            
+            slider.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, {passive: true});
+            
+            function handleSwipe() {
+                const diff = touchStartX - touchEndX;
+                if (Math.abs(diff) > 50) {
+                    if (diff > 0) navigateSlide(1);
+                    else navigateSlide(-1);
+                }
+            }
+        }
+
+        // Add to Cart
+        document.getElementById('addToCartBtn').addEventListener('click', () => {
+            if (!selectedSize) {
+                showToast('Please select a size', 'error');
+                return;
+            }
+            Cart.addItem(currentProduct, 1, selectedSize);
+        });
+
+        // Buy Now
+        document.getElementById('buyNowBtn').addEventListener('click', () => {
+            if (!selectedSize) {
+                showToast('Please select a size', 'error');
+                return;
+            }
+            
+            if (!getCurrentUser()) {
+                localStorage.setItem('buy_now_product', JSON.stringify({
+                    ...currentProduct,
+                    size: selectedSize,
+                    quantity: 1
+                }));
+                window.location.href = 'login.html?redirect=checkout';
+                return;
+            }
+            
+            Cart.addItem(currentProduct, 1, selectedSize);
+            window.location.href = 'checkout.html';
+        });
+
+        // Wishlist Toggle
+        document.getElementById('wishlistToggleBtn').addEventListener('click', async () => {
+            const user = getCurrentUser();
+            if (!user) {
+                showToast('Please login to add to wishlist', 'error');
+                return;
+            }
+            
+            const isWishlisted = await toggleWishlist(user.id, currentProduct.id);
+            updateWishlistButton(isWishlisted);
+        });
+
+        async function updateWishlistStatus() {
+            const user = getCurrentUser();
+            if (!user) return;
+            
+            const { data } = await supabase
+                .from('wishlist')
+                .select('*')
+                .eq('user_id', user.id)
+                .eq('product_id', currentProduct.id)
+                .single();
+                
+            updateWishlistButton(!!data);
+        }
+
+        function updateWishlistButton(isActive) {
+            const btn = document.getElementById('wishlistToggleBtn');
+            const icon = btn.querySelector('i');
+            if (isActive) {
+                icon.className = 'fas fa-heart';
+                btn.style.color = '#ff4d8d';
+            } else {
+                icon.className = 'far fa-heart';
+                btn.style.color = 'white';
+            }
+        }
+
+        async function toggleWishlist(userId, productId) {
+            const { data: existing } = await supabase
+                .from('wishlist')
+                .select('*')
+                .eq('user_id', userId)
+                .eq('product_id', productId)
+                .single();
+                
+            if (existing) {
+                await supabase.from('wishlist').delete().eq('id', existing.id);
+                showToast('Removed from wishlist');
+                return false;
+            } else {
+                await supabase.from('wishlist').insert({
+                    user_id: userId,
+                    product_id: productId,
+                    created_at: new Date().toISOString()
+                });
+                showToast('Added to wishlist ❤️');
+                return true;
+            }
+        }
+
+        function addToRecentlyViewed(product) {
+            let viewed = JSON.parse(localStorage.getItem('recently_viewed') || '[]');
+            viewed = viewed.filter(p => p.id !== product.id);
+            viewed.unshift(product);
+            viewed = viewed.slice(0, 20);
+            localStorage.setItem('recently_viewed', JSON.stringify(viewed));
+        }
+
+        async function loadRecommendedProducts() {
+            try {
+                const { data } = await supabase
+                    .from('products')
+                    .select('*')
+                    .limit(4);
+                    
+                if (data) renderProductGrid('recommendedProducts', data);
+            } catch (error) {
+                // Sample products
+                const sampleProducts = [
+                    { id: 2, name: 'Floral Maxi Dress', original_price: 2199, discounted_price: 999, images: ['https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400'] },
+                    { id: 3, name: 'Designer Saree', original_price: 3999, discounted_price: 1499, images: ['https://images.unsplash.com/photo-1610030181087-2e3915f28ff8?w=400'] },
+                ];
+                renderProductGrid('recommendedProducts', sampleProducts);
+            }
+        }
+
+        function renderProductGrid(containerId, products) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = products.map(p => `
+                <div class="product-card" onclick="window.location.href='product.html?id=${p.id}'">
+                    <div style="position: relative;">
+                        <img src="${p.images[0]}" alt="${p.name}" class="product-image">
+                        <div class="product-wishlist" onclick="event.stopPropagation(); quickWishlist(${p.id})">
+                            <i class="far fa-heart"></i>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">${p.name}</h3>
+                        <div class="product-price">
+                            <span class="price-current">₹${p.discounted_price}</span>
+                            <span class="price-original">₹${p.original_price}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function shareProduct(platform) {
+            const url = window.location.href;
+            const text = `Check out ${currentProduct.name} on Glammora!`;
+            
+            switch(platform) {
+                case 'whatsapp':
+                    window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`);
+                    break;
+                case 'facebook':
+                    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`);
+                    break;
+                case 'twitter':
+                    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`);
+                    break;
+                case 'copy':
+                    navigator.clipboard.writeText(url);
+                    showToast('Link copied! 📋');
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>
