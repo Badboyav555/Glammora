@@ -328,7 +328,168 @@
     <script src="js/app.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        function switchTab(tab) {
+        // Login Page Script
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if already logged in
+    if (isLoggedIn()) {
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    // Focus phone input
+    document.getElementById('loginPhone').focus();
+});
+
+function switchTab(tab) {
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+    document.querySelectorAll('.error-message').forEach(el => { el.textContent = ''; el.classList.remove('show'); });
+    document.querySelectorAll('.success-message').forEach(el => { el.textContent = ''; el.classList.remove('show'); });
+    
+    if (tab === 'login') {
+        document.querySelectorAll('.auth-tab')[0].classList.add('active');
+        document.getElementById('loginForm').classList.add('active');
+        document.getElementById('loginPhone').focus();
+    } else {
+        document.querySelectorAll('.auth-tab')[1].classList.add('active');
+        document.getElementById('signupForm').classList.add('active');
+        document.getElementById('signupPhone').focus();
+    }
+}
+
+function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fas fa-eye';
+    } else {
+        input.type = 'password';
+        icon.className = 'fas fa-eye-slash';
+    }
+}
+
+// Login Handler
+async function handleLogin(event) {
+    event.preventDefault();
+    
+    const phone = document.getElementById('loginPhone').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const submitBtn = document.getElementById('loginSubmitBtn');
+    const errorEl = document.getElementById('loginError');
+    
+    // Reset error
+    errorEl.textContent = '';
+    errorEl.classList.remove('show');
+    
+    // Validate
+    if (!phone || phone.length !== 10 || !/^\d+$/.test(phone)) {
+        errorEl.textContent = 'Enter valid 10-digit mobile number';
+        errorEl.classList.add('show');
+        return;
+    }
+    if (!password || password.length < 6) {
+        errorEl.textContent = 'Password must be at least 6 characters';
+        errorEl.classList.add('show');
+        return;
+    }
+    
+    // Show loading
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+    
+    // Call auth
+    const result = await CustomAuth.signIn(phone, password);
+    
+    if (result.success) {
+        // Success
+        submitBtn.innerHTML = '<i class="fas fa-check"></i> Success!';
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirect = urlParams.get('redirect') || 'index.html';
+        
+        setTimeout(() => {
+            window.location.href = redirect;
+        }, 800);
+    } else {
+        // Error
+        errorEl.textContent = result.error;
+        errorEl.classList.add('show');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Login</span><i class="fas fa-arrow-right" style="margin-left:8px;"></i>';
+    }
+}
+
+// Signup Handler
+async function handleSignup(event) {
+    event.preventDefault();
+    
+    const phone = document.getElementById('signupPhone').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    const confirmPassword = document.getElementById('signupConfirmPassword').value;
+    const submitBtn = document.getElementById('signupSubmitBtn');
+    const errorEl = document.getElementById('signupError');
+    const successEl = document.getElementById('signupSuccess');
+    
+    // Reset messages
+    errorEl.textContent = '';
+    errorEl.classList.remove('show');
+    successEl.textContent = '';
+    successEl.classList.remove('show');
+    
+    // Validate
+    if (!phone || phone.length !== 10 || !/^\d+$/.test(phone)) {
+        errorEl.textContent = 'Enter valid 10-digit mobile number';
+        errorEl.classList.add('show');
+        return;
+    }
+    if (!password || password.length < 6) {
+        errorEl.textContent = 'Password must be at least 6 characters';
+        errorEl.classList.add('show');
+        return;
+    }
+    if (password !== confirmPassword) {
+        errorEl.textContent = 'Passwords do not match';
+        errorEl.classList.add('show');
+        return;
+    }
+    
+    // Show loading
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
+    
+    // Call auth
+    const result = await CustomAuth.signUp(phone, password);
+    
+    if (result.success) {
+        // Success
+        successEl.textContent = 'Account created! Redirecting...';
+        successEl.classList.add('show');
+        submitBtn.innerHTML = '<i class="fas fa-check"></i> Created!';
+        
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 1000);
+    } else {
+        // Error
+        errorEl.textContent = result.error;
+        errorEl.classList.add('show');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Create Account</span><i class="fas fa-user-plus" style="margin-left:8px;"></i>';
+    }
+}
+
+// Toast
+function showToast(msg) {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.style.cssText = 'background:#1f1f26;color:white;padding:14px 24px;border-radius:50px;text-align:center;margin-bottom:8px;border:1px solid #d81b60;animation:slideUp 0.3s ease;';
+    toast.textContent = msg;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+      /*  function switchTab(tab) {
             const tabs = document.querySelectorAll('.auth-tab');
             const forms = document.querySelectorAll('.auth-form');
             
@@ -464,7 +625,7 @@
         // Auto-focus phone input
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('loginPhone').focus();
-        });
+        });*/
     </script>
 </body>
 </html>
