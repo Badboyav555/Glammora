@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Login - Glammora</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #0f0f12 0%, #1a1a2e 100%);
+        }
+        
+        .auth-container {
+            width: 100%;
+            max-width: 420px;
+        }
+        
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .auth-logo h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .auth-logo p {
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+        
+        .auth-card {
+            background: var(--gradient-card);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            border: var(--border-glass);
+            padding: 32px 24px;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: var(--transition);
+        }
+        
+        .auth-tab.active {
+            color: var(--pink-accent);
+            border-bottom-color: var(--pink-primary);
+        }
+        
+        .auth-form {
+            display: none;
+        }
+        
+        .auth-form.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            border: 2px solid rgba(255,255,255,0.1);
+            transition: var(--transition);
+            overflow: hidden;
+        }
+        
+        .input-wrapper:focus-within {
+            border-color: var(--pink-primary);
+            box-shadow: 0 0 0 3px rgba(216, 27, 96, 0.1);
+        }
+        
+        .input-wrapper .prefix {
+            padding: 0 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .input-wrapper input {
+            flex: 1;
+            padding: 14px 16px;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .input-wrapper input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+        
+        .password-toggle {
+            padding: 0 16px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-pink);
+            transition: var(--transition);
+            margin-top: 8px;
+        }
+        
+        .submit-btn:active {
+            transform: scale(0.96);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 24px 0;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .social-login {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .social-btn {
+            flex: 1;
+            padding: 12px;
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 50px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+        
+        .social-btn:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .error-message {
+            color: #ff4444;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .success-message {
+            color: #4caf50;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            display: none;
+            text-align: center;
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-page">
+        <div class="auth-container">
+            <!-- Logo -->
+            <div class="auth-logo">
+                <h1>GLAMMORA.</h1>
+                <p>Premium Fashion Destination</p>
+            </div>
+
+            <!-- Auth Card -->
+            <div class="auth-card">
+                <!-- Tabs -->
+                <div class="auth-tabs">
+                    <button class="auth-tab active" onclick="switchTab('login')">Login</button>
+                    <button class="auth-tab" onclick="switchTab('signup')">Sign Up</button>
+                </div>
+
+                <!-- Login Form -->
+                <form class="auth-form active" id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>Mobile Number</label>
+                        <div class="input-wrapper">
+                            <span class="prefix">+91</span>
+                            <input type="tel" id="loginPhone" placeholder="Enter mobile number" maxlength="10" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="loginPassword" placeholder="Enter password" required>
+                            <span class="password-toggle" onclick="togglePassword('loginPassword', this)">
+                                <i class="fas fa-eye-slash"></i>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="error-message" id="loginError"></div>
+                    
+                    <button type="submit" class="submit-btn" id="loginSubmitBtn">
+                        <span>Login</span>
+                        <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+                    </button>
+                    
+                    <p style="text-align: center; margin-top: 16px; color: var(--text-secondary); font-size: 0.85rem;">
+                        By continuing, you agree to our 
+                        <a href="#" style="color: var(--pink-accent);">Terms</a> & 
+                        <a href="#" style="color: var(--pink-accent);">Privacy Policy</a>
+                    </p>
+                </form>
+
+                <!-- Signup Form -->
+                <form class="auth-form" id="signupForm" onsubmit="handleSignup(event)">
+                    <div class="form-group">
+                        <label>Mobile Number</label>
+                        <div class="input-wrapper">
+                            <span class="prefix">+91</span>
+                            <input type="tel" id="signupPhone" placeholder="Enter mobile number" maxlength="10" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Create Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="signupPassword" placeholder="Minimum 6 characters" required minlength="6">
+                            <span class="password-toggle" onclick="togglePassword('signupPassword', this)">
+                                <i class="fas fa-eye-slash"></i>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="signupConfirmPassword" placeholder="Re-enter password" required>
+                            <span class="password-toggle" onclick="togglePassword('signupConfirmPassword', this)">
+                                <i class="fas fa-eye-slash"></i>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="error-message" id="signupError"></div>
+                    <div class="success-message" id="signupSuccess"></div>
+                    
+                    <button type="submit" class="submit-btn" id="signupSubmitBtn">
+                        <span>Create Account</span>
+                        <i class="fas fa-user-plus" style="margin-left: 8px;"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        function switchTab(tab) {
+            const tabs = document.querySelectorAll('.auth-tab');
+            const forms = document.querySelectorAll('.auth-form');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            forms.forEach(f => f.classList.remove('active'));
+            
+            if (tab === 'login') {
+                tabs[0].classList.add('active');
+                forms[0].classList.add('active');
+            } else {
+                tabs[1].classList.add('active');
+                forms[1].classList.add('active');
+            }
+            
+            // Clear errors
+            document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
+            document.querySelectorAll('.success-message').forEach(el => el.classList.remove('show'));
+        }
+
+        function togglePassword(inputId, toggleBtn) {
+            const input = document.getElementById(inputId);
+            const icon = toggleBtn.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye-slash';
+            }
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const phone = document.getElementById('loginPhone').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const submitBtn = document.getElementById('loginSubmitBtn');
+            const errorEl = document.getElementById('loginError');
+            
+            // Validation
+            if (phone.length !== 10 || !/^\d+$/.test(phone)) {
+                errorEl.textContent = 'Please enter a valid 10-digit mobile number';
+                errorEl.classList.add('show');
+                return;
+            }
+            
+            if (password.length < 6) {
+                errorEl.textContent = 'Password must be at least 6 characters';
+                errorEl.classList.add('show');
+                return;
+            }
+            
+            // Disable button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+            errorEl.classList.remove('show');
+            
+            const result = await Auth.signIn(phone, password);
+            
+            if (result.success) {
+                showToast('Welcome back! 👋');
+                
+                // Check redirect
+                const urlParams = new URLSearchParams(window.location.search);
+                const redirect = urlParams.get('redirect') || 'index.html';
+                
+                setTimeout(() => {
+                    window.location.href = redirect;
+                }, 1000);
+            } else {
+                errorEl.textContent = result.error || 'Login failed. Please try again.';
+                errorEl.classList.add('show');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>Login</span><i class="fas fa-arrow-right" style="margin-left: 8px;"></i>';
+            }
+        }
+
+        async function handleSignup(event) {
+            event.preventDefault();
+            
+            const phone = document.getElementById('signupPhone').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('signupConfirmPassword').value;
+            const submitBtn = document.getElementById('signupSubmitBtn');
+            const errorEl = document.getElementById('signupError');
+            const successEl = document.getElementById('signupSuccess');
+            
+            // Clear messages
+            errorEl.classList.remove('show');
+            successEl.classList.remove('show');
+            
+            // Validation
+            if (phone.length !== 10 || !/^\d+$/.test(phone)) {
+                errorEl.textContent = 'Please enter a valid 10-digit mobile number';
+                errorEl.classList.add('show');
+                return;
+            }
+            
+            if (password.length < 6) {
+                errorEl.textContent = 'Password must be at least 6 characters';
+                errorEl.classList.add('show');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                errorEl.textContent = 'Passwords do not match';
+                errorEl.classList.add('show');
+                return;
+            }
+            
+            // Disable button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
+            
+            const result = await Auth.signUp(phone, password);
+            
+            if (result.success) {
+                successEl.textContent = 'Account created successfully! Redirecting...';
+                successEl.classList.add('show');
+                
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            } else {
+                errorEl.textContent = result.error || 'Signup failed. Please try again.';
+                errorEl.classList.add('show');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>Create Account</span><i class="fas fa-user-plus" style="margin-left: 8px;"></i>';
+            }
+        }
+
+        // Auto-focus phone input
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('loginPhone').focus();
+        });
+    </script>
+</body>
+</html>
