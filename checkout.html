@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Checkout - Glammora</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .checkout-page {
+            padding: 20px 20px 120px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .checkout-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .back-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .checkout-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .section-card {
+            background: var(--gradient-card);
+            border-radius: var(--radius-lg);
+            border: var(--border-glass);
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-title i {
+            color: var(--pink-accent);
+        }
+        
+        .address-form {
+            display: grid;
+            gap: 14px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        
+        .form-group label .required {
+            color: var(--pink-accent);
+        }
+        
+        .form-input {
+            padding: 12px 16px;
+            background: var(--bg-card);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            outline: none;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        
+        .form-input:focus {
+            border-color: var(--pink-primary);
+            box-shadow: 0 0 0 3px rgba(216, 27, 96, 0.1);
+        }
+        
+        .form-input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+        
+        select.form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23aaaaaa' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+        
+        .cart-items {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .cart-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .cart-item-image {
+            width: 70px;
+            height: 90px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        
+        .cart-item-details {
+            flex: 1;
+        }
+        
+        .cart-item-details h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .cart-item-details p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        
+        .cart-item-price {
+            font-weight: 600;
+            color: var(--pink-accent);
+        }
+        
+        .price-breakup {
+            margin-top: 16px;
+        }
+        
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 0.9rem;
+        }
+        
+        .price-row.total {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 16px;
+            margin-top: 8px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .price-row.savings {
+            color: #4caf50;
+        }
+        
+        .payment-method {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: rgba(216, 27, 96, 0.1);
+            border: 2px solid var(--pink-primary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+        }
+        
+        .payment-method.selected {
+            background: rgba(216, 27, 96, 0.2);
+        }
+        
+        .radio-custom {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--pink-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .radio-custom::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--pink-primary);
+            display: none;
+        }
+        
+        .payment-method.selected .radio-custom::after {
+            display: block;
+        }
+        
+        .place-order-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-pink);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .place-order-btn:active {
+            transform: scale(0.96);
+        }
+        
+        .place-order-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .referral-applied {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid #4caf50;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #4caf50;
+        }
+    </style>
+</head>
+<body>
+    <div class="checkout-page">
+        <!-- Header -->
+        <div class="checkout-header">
+            <button class="back-btn" onclick="history.back()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1 class="checkout-title">Checkout</h1>
+        </div>
+
+        <!-- Delivery Address -->
+        <div class="section-card">
+            <div class="section-title">
+                <i class="fas fa-map-marker-alt"></i>
+                Delivery Address
+            </div>
+            <form class="address-form" id="addressForm">
+                <div class="form-group">
+                    <label>Full Name <span class="required">*</span></label>
+                    <input type="text" class="form-input" name="fullName" placeholder="Enter full name" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Phone Number <span class="required">*</span></label>
+                        <input type="tel" class="form-input" name="phone" placeholder="10-digit number" maxlength="10" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Alternate Phone</label>
+                        <input type="tel" class="form-input" name="alternatePhone" placeholder="Optional" maxlength="10">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>House / Flat / Building <span class="required">*</span></label>
+                    <input type="text" class="form-input" name="address" placeholder="House no., building name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Area / Street / Colony <span class="required">*</span></label>
+                    <input type="text" class="form-input" name="area" placeholder="Area or street name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Landmark</label>
+                    <input type="text" class="form-input" name="landmark" placeholder="Nearby landmark (optional)">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>City <span class="required">*</span></label>
+                        <input type="text" class="form-input" name="city" placeholder="City" required>
+                    </div>
+                    <div class="form-group">
+                        <label>State <span class="required">*</span></label>
+                        <select class="form-input" name="state" required>
+                            <option value="">Select state</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <option value="Gujarat">Gujarat</option>
+                            <option value="Rajasthan">Rajasthan</option>
+                            <option value="Uttar Pradesh">Uttar Pradesh</option>
+                            <option value="West Bengal">West Bengal</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Pincode <span class="required">*</span></label>
+                        <input type="text" class="form-input" name="pincode" placeholder="6-digit pincode" maxlength="6" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Country</label>
+                        <input type="text" class="form-input" name="country" value="India" readonly>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="section-card">
+            <div class="section-title">
+                <i class="fas fa-shopping-bag"></i>
+                Order Summary
+            </div>
+            <div class="cart-items" id="cartItems"></div>
+            <div class="price-breakup" id="priceBreakup"></div>
+        </div>
+
+        <!-- Referral Applied -->
+        <div class="referral-applied" id="referralInfo" style="display: none;">
+            <i class="fas fa-gift"></i>
+            <span>Referral discount applied! You'll get special benefits.</span>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="section-card">
+            <div class="section-title">
+                <i class="fas fa-credit-card"></i>
+                Payment Method
+            </div>
+            <div class="payment-method selected">
+                <div class="radio-custom"></div>
+                <div>
+                    <p style="font-weight: 600;">Cash on Delivery</p>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary);">Pay when you receive your order</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Place Order Button -->
+        <button class="place-order-btn" id="placeOrderBtn" onclick="placeOrder()">
+            <span>Place Order</span>
+            <span id="totalAmount"></span>
+        </button>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/cart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if user is logged in
+            if (!getCurrentUser()) {
+                window.location.href = 'login.html?redirect=checkout.html';
+                return;
+            }
+            
+            loadCartItems();
+            updatePriceBreakup();
+            checkReferral();
+            
+            // Auto-fill saved address
+            loadSavedAddress();
+        });
+
+        function loadCartItems() {
+            const cart = Cart.getCart();
+            const cartItems = document.getElementById('cartItems');
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
+                        <i class="fas fa-shopping-cart" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <p style="margin-top: 12px;">Your cart is empty</p>
+                        <a href="index.html" style="color: var(--pink-accent);">Continue Shopping</a>
+                    </div>
+                `;
+                document.getElementById('placeOrderBtn').disabled = true;
+                return;
+            }
+            
+            cartItems.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <img src="${item.images[0]}" alt="${item.name}" class="cart-item-image">
+                    <div class="cart-item-details">
+                        <h4>${item.name}</h4>
+                        <p>Size: ${item.size} | Qty: ${item.quantity}</p>
+                        <p class="cart-item-price">₹${(item.discounted_price * item.quantity).toLocaleString()}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updatePriceBreakup() {
+            const cart = Cart.getCart();
+            const subtotal = cart.reduce((sum, item) => sum + (item.discounted_price * item.quantity), 0);
+            const originalTotal = cart.reduce((sum, item) => sum + (item.original_price * item.quantity), 0);
+            const savings = originalTotal - subtotal;
+            const delivery = subtotal > 999 ? 0 : 99;
+            const total = subtotal + delivery;
+            
+            const breakup = document.getElementById('priceBreakup');
+            breakup.innerHTML = `
+                <div class="price-row">
+                    <span>Subtotal (${cart.length} items)</span>
+                    <span>₹${subtotal.toLocaleString()}</span>
+                </div>
+                <div class="price-row savings">
+                    <span>You Save</span>
+                    <span>-₹${savings.toLocaleString()}</span>
+                </div>
+                <div class="price-row">
+                    <span>Delivery Charges</span>
+                    <span>${delivery === 0 ? '<span style="color: #4caf50;">FREE</span>' : '₹' + delivery}</span>
+                </div>
+                <div class="price-row total">
+                    <span>Total Amount</span>
+                    <span>₹${total.toLocaleString()}</span>
+                </div>
+            `;
+            
+            document.getElementById('totalAmount').textContent = `₹${total.toLocaleString()}`;
+        }
+
+        function checkReferral() {
+            const referralCode = localStorage.getItem('glammora_ref');
+            if (referralCode) {
+                document.getElementById('referralInfo').style.display = 'flex';
+            }
+        }
+
+        async function loadSavedAddress() {
+            const user = getCurrentUser();
+            if (!user) return;
+            
+            try {
+                const { data } = await supabase
+                    .from('addresses')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .order('is_default', { ascending: false })
+                    .limit(1)
+                    .single();
+                    
+                if (data) {
+                    const form = document.getElementById('addressForm');
+                    form.fullName.value = data.full_name || '';
+                    form.phone.value = data.phone || '';
+                    form.alternatePhone.value = data.alternate_phone || '';
+                    form.address.value = data.address || '';
+                    form.area.value = data.area || '';
+                    form.landmark.value = data.landmark || '';
+                    form.city.value = data.city || '';
+                    form.state.value = data.state || '';
+                    form.pincode.value = data.pincode || '';
+                }
+            } catch (error) {
+                // No saved address
+            }
+        }
+
+        async function placeOrder() {
+            const cart = Cart.getCart();
+            
+            if (cart.length === 0) {
+                showToast('Your cart is empty', 'error');
+                return;
+            }
+            
+            // Validate form
+            const form = document.getElementById('addressForm');
+            const formData = new FormData(form);
+            const address = Object.fromEntries(formData.entries());
+            
+            if (!address.fullName || !address.phone || !address.address || !address.city || !address.pincode) {
+                showToast('Please fill all required fields', 'error');
+                return;
+            }
+            
+            if (address.phone.length !== 10) {
+                showToast('Please enter valid phone number', 'error');
+                return;
+            }
+            
+            if (address.pincode.length !== 6) {
+                showToast('Please enter valid pincode', 'error');
+                return;
+            }
+            
+            const user = getCurrentUser();
+            const placeOrderBtn = document.getElementById('placeOrderBtn');
+            
+            // Disable button
+            placeOrderBtn.disabled = true;
+            placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing Order...';
+            
+            try {
+                const subtotal = cart.reduce((sum, item) => sum + (item.discounted_price * item.quantity), 0);
+                const delivery = subtotal > 999 ? 0 : 99;
+                const total = subtotal + delivery;
+                
+                const orderData = {
+                    user_id: user.id,
+                    user_phone: user.user_metadata?.phone || address.phone,
+                    full_address: address,
+                    items: cart,
+                    subtotal: subtotal,
+                    delivery_charge: delivery,
+                    total_amount: total,
+                    referral_code: localStorage.getItem('glammora_ref') || null,
+                    payment_method: 'COD',
+                    status: 'Pending',
+                    created_at: new Date().toISOString()
+                };
+                
+                const { data: order, error } = await supabase
+                    .from('orders')
+                    .insert(orderData)
+                    .select()
+                    .single();
+                    
+                if (error) throw error;
+                
+                // Save address for future
+                await supabase.from('addresses').upsert({
+                    user_id: user.id,
+                    full_name: address.fullName,
+                    phone: address.phone,
+                    alternate_phone: address.alternatePhone,
+                    address: address.address,
+                    area: address.area,
+                    landmark: address.landmark,
+                    city: address.city,
+                    state: address.state,
+                    pincode: address.pincode,
+                    country: address.country,
+                    is_default: true
+                });
+                
+                // Process referral
+                if (localStorage.getItem('glammora_ref')) {
+                    await Referral.processReferral(user.id, order.id);
+                }
+                
+                // Clear cart
+                Cart.clearCart();
+                localStorage.removeItem('glammora_ref');
+                
+                showToast('Order placed successfully! 🎉');
+                
+                setTimeout(() => {
+                    window.location.href = `profile.html#orders`;
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Order error:', error);
+                showToast('Failed to place order. Please try again.', 'error');
+                placeOrderBtn.disabled = false;
+                placeOrderBtn.innerHTML = '<span>Place Order</span><span id="totalAmount"></span>';
+            }
+        }
+    </script>
+</body>
+</html>
