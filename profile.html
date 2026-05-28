@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>My Profile - Glammora</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .profile-page {
+            padding: 20px 20px 100px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .profile-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .profile-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        
+        .profile-phone {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .profile-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 8px;
+        }
+        
+        .profile-tabs::-webkit-scrollbar { display: none; }
+        
+        .profile-tab {
+            padding: 10px 20px;
+            background: var(--bg-card);
+            border: none;
+            border-radius: 50px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            font-size: 0.9rem;
+        }
+        
+        .profile-tab.active {
+            background: var(--pink-primary);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .section-card {
+            background: var(--gradient-card);
+            border-radius: var(--radius-lg);
+            border: var(--border-glass);
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .order-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .order-id {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .order-date {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .order-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-pending { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
+        .status-confirmed { background: rgba(33, 150, 243, 0.2); color: #2196f3; }
+        .status-packed { background: rgba(156, 39, 176, 0.2); color: #9c27b0; }
+        .status-shipped { background: rgba(255, 152, 0, 0.2); color: #ff9800; }
+        .status-out-for-delivery { background: rgba(76, 175, 80, 0.2); color: #4caf50; }
+        .status-delivered { background: rgba(76, 175, 80, 0.3); color: #4caf50; }
+        .status-cancelled { background: rgba(244, 67, 54, 0.2); color: #f44336; }
+        
+        .order-items {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            overflow-x: auto;
+        }
+        
+        .order-item-img {
+            width: 60px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .order-total {
+            font-weight: 700;
+            color: var(--pink-accent);
+        }
+        
+        .tracking-timeline {
+            position: relative;
+            padding-left: 24px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 20px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .timeline-item.completed::before {
+            background: #4caf50;
+            border-color: #4caf50;
+        }
+        
+        .timeline-item.active::before {
+            background: var(--pink-accent);
+            border-color: var(--pink-accent);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(216, 27, 96, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(216, 27, 96, 0); }
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: -16px;
+            top: 18px;
+            width: 2px;
+            height: calc(100% - 10px);
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .timeline-item:last-child::after {
+            display: none;
+        }
+        
+        .timeline-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .timeline-date {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .referral-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .stat-box {
+            background: var(--bg-card);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--pink-accent);
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        
+        .referral-link-box {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .referral-link-box input {
+            flex: 1;
+            padding: 12px;
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            outline: none;
+        }
+        
+        .wishlist-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .address-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+        
+        .address-type {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(216, 27, 96, 0.2);
+            color: var(--pink-accent);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+        
+        .logout-btn {
+            width: 100%;
+            padding: 16px;
+            background: transparent;
+            border: 2px solid rgba(244, 67, 54, 0.5);
+            border-radius: 50px;
+            color: #f44336;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 20px;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(244, 67, 54, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-page">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-avatar" id="profileAvatar">G</div>
+            <h2 class="profile-name" id="profileName">User</h2>
+            <p class="profile-phone" id="profilePhone">+91 XXXXXXXXXX</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="profile-tabs">
+            <button class="profile-tab active" onclick="switchProfileTab('orders')">
+                <i class="fas fa-box"></i> Orders
+            </button>
+            <button class="profile-tab" onclick="switchProfileTab('referral')">
+                <i class="fas fa-gift"></i> Refer & Earn
+            </button>
+            <button class="profile-tab" onclick="switchProfileTab('wishlist')">
+                <i class="fas fa-heart"></i> Wishlist
+            </button>
+            <button class="profile-tab" onclick="switchProfileTab('addresses')">
+                <i class="fas fa-map-marker-alt"></i> Addresses
+            </button>
+            <button class="profile-tab" onclick="switchProfileTab('account')">
+                <i class="fas fa-user"></i> Account
+            </button>
+        </div>
+
+        <!-- Orders Tab -->
+        <div class="tab-content active" id="ordersTab">
+            <div id="ordersList"></div>
+        </div>
+
+        <!-- Referral Tab -->
+        <div class="tab-content" id="referralTab">
+            <div class="section-card">
+                <div class="section-title">
+                    <i class="fas fa-gift"></i> Refer & Earn 💸
+                </div>
+                <div class="referral-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="totalEarnings">₹0</div>
+                        <div class="stat-label">Total Earnings</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="referralCount">0</div>
+                        <div class="stat-label">Referred Orders</div>
+                    </div>
+                </div>
+                <div class="referral-link-box">
+                    <input type="text" id="referralLink" readonly>
+                    <button class="btn-primary" onclick="copyReferralLink()">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+                <button class="btn-outline" style="width:100%;" onclick="shareWhatsApp()">
+                    <i class="fab fa-whatsapp"></i> Share on WhatsApp
+                </button>
+            </div>
+        </div>
+
+        <!-- Wishlist Tab -->
+        <div class="tab-content" id="wishlistTab">
+            <div class="wishlist-grid" id="wishlistGrid"></div>
+        </div>
+
+        <!-- Addresses Tab -->
+        <div class="tab-content" id="addressesTab">
+            <div id="addressesList"></div>
+            <button class="btn-primary" style="width:100%; margin-top:12px;" onclick="addNewAddress()">
+                <i class="fas fa-plus"></i> Add New Address
+            </button>
+        </div>
+
+        <!-- Account Tab -->
+        <div class="tab-content" id="accountTab">
+            <div class="section-card">
+                <div class="section-title">
+                    <i class="fas fa-user-circle"></i> Account Details
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="color: var(--text-secondary); font-size: 0.85rem;">Name</label>
+                    <p style="font-weight: 500;" id="accountName">-</p>
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="color: var(--text-secondary); font-size: 0.85rem;">Phone</label>
+                    <p style="font-weight: 500;" id="accountPhone">-</p>
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="color: var(--text-secondary); font-size: 0.85rem;">Referral Code</label>
+                    <p style="font-weight: 500; color: var(--pink-accent);" id="accountReferralCode">-</p>
+                </div>
+                <div>
+                    <label style="color: var(--text-secondary); font-size: 0.85rem;">Member Since</label>
+                    <p style="font-weight: 500;" id="accountCreated">-</p>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/referral.js"></script>
+    <script src="js/cart.js"></script>
+    <script>
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            currentUser = getCurrentUser();
+            
+            if (!currentUser) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Load profile
+            await loadProfile();
+            await loadOrders();
+            await loadReferralInfo();
+            await loadWishlist();
+            await loadAddresses();
+            await loadAccountDetails();
+            
+            // Check hash for direct tab navigation
+            const hash = window.location.hash.replace('#', '');
+            if (hash) {
+                switchProfileTab(hash);
+            }
+        });
+
+        async function loadProfile() {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
+                
+            if (profile) {
+                const initial = (profile.full_name || 'User')[0].toUpperCase();
+                document.getElementById('profileAvatar').textContent = initial;
+                document.getElementById('profileName').textContent = profile.full_name || 'User';
+                document.getElementById('profilePhone').textContent = profile.phone || currentUser.user_metadata?.phone || '';
+            }
+        }
+
+        function switchProfileTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+            event.target.closest('.profile-tab').classList.add('active');
+            
+            // Show selected content
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(`${tab}Tab`).classList.add('active');
+            
+            // Update URL hash
+            window.location.hash = tab;
+        }
+
+        async function loadOrders() {
+            const ordersList = document.getElementById('ordersList');
+            
+            try {
+                const { data: orders } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false })
+                    .limit(20);
+                    
+                if (orders && orders.length > 0) {
+                    ordersList.innerHTML = orders.map(order => `
+                        <div class="order-card">
+                            <div class="order-header">
+                                <div>
+                                    <div class="order-id">Order #${order.id.toString().slice(-8).toUpperCase()}</div>
+                                    <div class="order-date">${new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                                </div>
+                                <span class="order-status status-${order.status.toLowerCase().replace(/\s+/g, '-')}">${order.status}</span>
+                            </div>
+                            <div class="order-items">
+                                ${order.items.map(item => `
+                                    <img src="${item.images[0]}" alt="${item.name}" class="order-item-img">
+                                `).join('')}
+                            </div>
+                            <div class="order-footer">
+                                <span>${order.items.length} item(s)</span>
+                                <span class="order-total">₹${order.total_amount.toLocaleString()}</span>
+                            </div>
+                            ${order.status !== 'Delivered' && order.status !== 'Cancelled' ? `
+                                <div style="margin-top: 12px;">
+                                    <button class="btn-outline" style="width:100%;" onclick="trackOrder('${order.id}')">
+                                        <i class="fas fa-truck"></i> Track Order
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('');
+                } else {
+                    ordersList.innerHTML = `
+                        <div style="text-align: center; padding: 40px 20px;">
+                            <i class="fas fa-box-open" style="font-size: 4rem; opacity: 0.2;"></i>
+                            <p style="margin-top: 16px; color: var(--text-secondary);">No orders yet</p>
+                            <a href="index.html" class="btn-primary" style="display: inline-block; margin-top: 16px;">Start Shopping</a>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                ordersList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Failed to load orders</p>';
+            }
+        }
+
+        async function trackOrder(orderId) {
+            const { data: order } = await supabase
+                .from('orders')
+                .select('*')
+                .eq('id', orderId)
+                .single();
+                
+            if (!order) return;
+            
+            const statuses = ['Pending', 'Confirmed', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered'];
+            const currentIndex = statuses.indexOf(order.status);
+            
+            const timelineHTML = statuses.map((status, index) => {
+                let className = '';
+                if (index < currentIndex) className = 'completed';
+                else if (index === currentIndex) className = 'active';
+                
+                return `
+                    <div class="timeline-item ${className}">
+                        <div class="timeline-label">${status}</div>
+                        <div class="timeline-date">${index === currentIndex ? new Date(order.created_at).toLocaleDateString() : ''}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Show in modal
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8);
+                display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+            `;
+            modal.innerHTML = `
+                <div class="section-card" style="width: 100%; max-width: 400px; max-height: 80vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3>Order Tracking</h3>
+                        <button onclick="this.closest('div').parentElement.remove()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">✕</button>
+                    </div>
+                    <div class="tracking-timeline">
+                        ${timelineHTML}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
+            });
+        }
+
+        async function loadReferralInfo() {
+            const referralCode = await Referral.getUserReferralCode(currentUser.id);
+            const earnings = await Referral.getReferralEarnings(currentUser.id);
+            const count = await Referral.getReferralCount(currentUser.id);
+            
+            document.getElementById('totalEarnings').textContent = `₹${earnings.toFixed(2)}`;
+            document.getElementById('referralCount').textContent = count;
+            document.getElementById('referralLink').value = `${APP_CONFIG.referralBase}${referralCode}`;
+        }
+
+        async function loadWishlist() {
+            const wishlistGrid = document.getElementById('wishlistGrid');
+            
+            try {
+                const { data: wishlist } = await supabase
+                    .from('wishlist')
+                    .select('product_id')
+                    .eq('user_id', currentUser.id);
+                    
+                if (wishlist && wishlist.length > 0) {
+                    const productIds = wishlist.map(w => w.product_id);
+                    const { data: products } = await supabase
+                        .from('products')
+                        .select('*')
+                        .in('id', productIds);
+                        
+                    if (products) {
+                        wishlistGrid.innerHTML = products.map(p => `
+                            <div class="product-card" onclick="window.location.href='product.html?id=${p.id}'">
+                                <img src="${p.images[0]}" alt="${p.name}" class="product-image">
+                                <div class="product-info">
+                                    <h3 class="product-name">${p.name}</h3>
+                                    <div class="product-price">
+                                        <span class="price-current">₹${p.discounted_price}</span>
+                                    </div>
+                                    <button class="btn-primary" style="width:100%; margin-top:8px; padding:8px; font-size:0.85rem;" 
+                                        onclick="event.stopPropagation(); moveToCart(${p.id})">
+                                        Move to Cart
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                } else {
+                    wishlistGrid.innerHTML = '<p style="text-align: center; color: var(--text-secondary); grid-column: 1/-1;">No items in wishlist</p>';
+                }
+            } catch (error) {
+                console.error('Error loading wishlist:', error);
+            }
+        }
+
+        async function moveToCart(productId) {
+            const { data: product } = await supabase
+                .from('products')
+                .select('*')
+                .eq('id', productId)
+                .single();
+                
+            if (product) {
+                Cart.addItem(product);
+                // Remove from wishlist
+                await supabase.from('wishlist').delete().eq('user_id', currentUser.id).eq('product_id', productId);
+                loadWishlist();
+            }
+        }
+
+        async function loadAddresses() {
+            const addressesList = document.getElementById('addressesList');
+            
+            try {
+                const { data: addresses } = await supabase
+                    .from('addresses')
+                    .select('*')
+                    .eq('user_id', currentUser.id);
+                    
+                if (addresses && addresses.length > 0) {
+                    addressesList.innerHTML = addresses.map(addr => `
+                        <div class="address-card">
+                            ${addr.is_default ? '<span class="address-type">Default</span>' : ''}
+                            <p style="font-weight: 600; margin-bottom: 4px;">${addr.full_name}</p>
+                            <p style="font-size: 0.9rem; color: var(--text-secondary);">${addr.address}, ${addr.area}</p>
+                            <p style="font-size: 0.9rem; color: var(--text-secondary);">${addr.city}, ${addr.state} - ${addr.pincode}</p>
+                            <p style="font-size: 0.9rem; color: var(--text-secondary);">📱 ${addr.phone}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    addressesList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No saved addresses</p>';
+                }
+            } catch (error) {
+                console.error('Error loading addresses:', error);
+            }
+        }
+
+        function addNewAddress() {
+            window.location.href = 'checkout.html';
+        }
+
+        async function loadAccountDetails() {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
+                
+            if (profile) {
+                document.getElementById('accountName').textContent = profile.full_name || 'Not set';
+                document.getElementById('accountPhone').textContent = profile.phone || currentUser.user_metadata?.phone || '-';
+                document.getElementById('accountReferralCode').textContent = profile.referral_code || '-';
+                document.getElementById('accountCreated').textContent = new Date(profile.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+            }
+        }
+
+        function copyReferralLink() {
+            const link = document.getElementById('referralLink');
+            link.select();
+            document.execCommand('copy');
+            showToast('Referral link copied! 📋');
+        }
+
+        function shareWhatsApp() {
+            const link = document.getElementById('referralLink').value;
+            const message = `Hey! 🛍️ Check out Glammora for amazing fashion deals!\n\nUse my referral link for exclusive discounts: ${link}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+        }
+
+        async function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                await supabase.auth.signOut();
+                localStorage.removeItem('glammora_user');
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+</body>
+</html>
