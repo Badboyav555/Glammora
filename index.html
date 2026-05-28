@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Glammora - Premium Fashion</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <h1>GLAMMORA</h1>
+                <span class="logo-dot">.</span>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" id="searchBtn">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button class="icon-btn" id="wishlistBtn" onclick="window.location.href='profile.html#wishlist'">
+                    <i class="fas fa-heart"></i>
+                    <span class="badge wishlist-count">0</span>
+                </button>
+                <button class="icon-btn" id="cartBtn" onclick="window.location.href='checkout.html'">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="badge cart-count">0</span>
+                </button>
+                <button class="icon-btn" id="profileBtn" onclick="window.location.href='profile.html'">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Search Overlay -->
+    <div class="search-overlay" id="searchOverlay">
+        <div class="search-container">
+            <div class="search-header">
+                <input type="text" class="search-input" placeholder="Search for products, brands..." id="searchInput">
+                <button class="icon-btn" id="closeSearch">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+        </div>
+    </div>
+
+    <!-- Hero Banner Slider -->
+    <section class="hero-slider">
+        <div class="slider-container" id="heroSlider">
+            <div class="slide active">
+                <div class="slide-content">
+                    <h2>Festival Sale</h2>
+                    <p>Up to 70% Off on Ethnic Wear</p>
+                    <button class="btn-primary" onclick="window.location.href='product.html?category=ethnic'">Shop Now</button>
+                </div>
+            </div>
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>New Arrivals</h2>
+                    <p>Fresh Drops Just Landed</p>
+                    <button class="btn-primary" onclick="window.location.href='product.html?category=new'">Explore</button>
+                </div>
+            </div>
+            <div class="slide">
+                <div class="slide-content">
+                    <h2>Premium Collection</h2>
+                    <p>Luxury Fashion at Best Prices</p>
+                    <button class="btn-primary" onclick="window.location.href='product.html?category=premium'">View Collection</button>
+                </div>
+            </div>
+        </div>
+        <div class="slider-dots"></div>
+    </section>
+
+    <!-- Categories -->
+    <section class="categories-section">
+        <h2 class="section-title">Shop by Category</h2>
+        <div class="categories-grid" id="categoriesGrid"></div>
+    </section>
+
+    <!-- Trending Products -->
+    <section class="products-section">
+        <div class="section-header">
+            <h2 class="section-title">Trending Now 🔥</h2>
+            <a href="#" class="view-all">View All</a>
+        </div>
+        <div class="products-grid" id="trendingProducts"></div>
+    </section>
+
+    <!-- Featured Collections -->
+    <section class="collections-section">
+        <h2 class="section-title">Featured Collections</h2>
+        <div class="collections-scroll" id="featuredCollections"></div>
+    </section>
+
+    <!-- New Arrivals -->
+    <section class="products-section">
+        <div class="section-header">
+            <h2 class="section-title">New Arrivals ✨</h2>
+            <a href="#" class="view-all">View All</a>
+        </div>
+        <div class="products-grid" id="newArrivals"></div>
+    </section>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item active">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="#" class="nav-item" id="bottomSearchBtn">
+            <i class="fas fa-search"></i>
+            <span>Search</span>
+        </a>
+        <a href="checkout.html" class="nav-item">
+            <i class="fas fa-shopping-bag"></i>
+            <span>Cart</span>
+        </a>
+        <a href="profile.html#wishlist" class="nav-item">
+            <i class="fas fa-heart"></i>
+            <span>Wishlist</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/products.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/referral.js"></script>
+    <script>
+        // Initialize home page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCategories();
+            loadTrendingProducts();
+            loadNewArrivals();
+            loadFeaturedCollections();
+            initSlider();
+            initSearch();
+            updateCartCount();
+            updateWishlistCount();
+            
+            // Check referral
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref');
+            if (refCode) {
+                saveReferral(refCode);
+            }
+        });
+    </script>
+</body>
+</html>
