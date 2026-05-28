@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Glammora</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #0a0a0f; color: white; min-height: 100vh; }
+        
+        .admin-header {
+            background: #111118; padding: 16px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100;
+        }
+        .admin-header h2 { color: #ff4d8d; font-size: 1.3rem; }
+        .admin-header button {
+            background: #d81b60; color: white; border: none;
+            padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;
+        }
+        
+        .tabs {
+            display: flex; gap: 4px; padding: 12px 16px;
+            overflow-x: auto; background: #111118; border-bottom: 1px solid #222;
+        }
+        .tab {
+            padding: 10px 18px; background: #1a1a22; border: none;
+            color: #aaaaaa; border-radius: 8px; cursor: pointer;
+            white-space: nowrap; font-size: 0.85rem; font-weight: 600;
+        }
+        .tab.active { background: #d81b60; color: white; }
+        
+        .content { padding: 20px; }
+        .section { display: none; }
+        .section.active { display: block; }
+        
+        .stats {
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 12px; margin-bottom: 24px;
+        }
+        .stat-card {
+            background: #1a1a22; padding: 16px; border-radius: 12px; border: 1px solid #222;
+        }
+        .stat-card p { color: #aaaaaa; font-size: 0.8rem; margin-bottom: 6px; }
+        .stat-card h3 { font-size: 1.5rem; color: #ff4d8d; }
+        
+        table {
+            width: 100%; border-collapse: collapse;
+            background: #1a1a22; border-radius: 12px; overflow: hidden;
+        }
+        th {
+            background: #111118; padding: 12px 10px; text-align: left;
+            font-size: 0.75rem; color: #aaaaaa; text-transform: uppercase;
+        }
+        td {
+            padding: 10px; border-bottom: 1px solid #222; font-size: 0.85rem;
+        }
+        
+        .card {
+            background: #1a1a22; padding: 20px; border-radius: 12px;
+            border: 1px solid #222; margin-bottom: 20px;
+        }
+        .card h4 { margin-bottom: 16px; color: #ff4d8d; }
+        
+        input, select {
+            width: 100%; padding: 12px; background: #0f0f12;
+            border: 1px solid #333; border-radius: 8px; color: white;
+            margin-top: 6px; font-size: 0.9rem;
+        }
+        label { color: #aaaaaa; font-size: 0.85rem; }
+        
+        .btn {
+            background: #d81b60; color: white; border: none;
+            padding: 12px 20px; border-radius: 8px; cursor: pointer;
+            font-weight: bold; font-size: 0.9rem;
+        }
+        .btn-blue { background: #2196f3; }
+        .btn-red { background: #f44336; }
+        .btn-green { background: #4caf50; }
+        
+        .msg { margin-top: 12px; padding: 10px; border-radius: 8px; }
+        .msg-success { background: #4caf5022; color: #4caf50; }
+        .msg-error { background: #f4433622; color: #f44336; }
+        
+        @media (max-width: 600px) {
+            .stats { grid-template-columns: 1fr; }
+            th, td { font-size: 0.75rem; padding: 8px 6px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <h2>GLAMMORA ADMIN</h2>
+        <button onclick="adminLogout()">Logout</button>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab active" onclick="showSection('dashboard')">Dashboard</button>
+        <button class="tab" onclick="showSection('orders')">Orders</button>
+        <button class="tab" onclick="showSection('users')">Users</button>
+        <button class="tab" onclick="showSection('products')">Products</button>
+        <button class="tab" onclick="showSection('referrals')">Referrals</button>
+    </div>
+    
+    <div class="content">
+        <!-- Dashboard Section -->
+        <div class="section active" id="dashboardSection">
+            <div class="stats">
+                <div class="stat-card">
+                    <p>Total Revenue</p>
+                    <h3 id="totalRevenue">Rs. 0</h3>
+                </div>
+                <div class="stat-card">
+                    <p>Total Orders</p>
+                    <h3 id="totalOrders">0</h3>
+                </div>
+                <div class="stat-card">
+                    <p>Pending Orders</p>
+                    <h3 id="pendingOrders">0</h3>
+                </div>
+                <div class="stat-card">
+                    <p>Total Users</p>
+                    <h3 id="totalUsers">0</h3>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h4>Recent Orders</h4>
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentOrdersTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Orders Section -->
+        <div class="section" id="ordersSection">
+            <div class="card">
+                <h4>All Orders</h4>
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Address</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Referral</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Users Section -->
+        <div class="section" id="usersSection">
+            <div class="card">
+                <h4>All Users</h4>
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Phone</th>
+                                <th>Referral Code</th>
+                                <th>Orders</th>
+                                <th>Earnings</th>
+                                <th>Joined</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Products Section -->
+        <div class="section" id="productsSection">
+            <div class="card">
+                <h4>All Products</h4>
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Referrals Section -->
+        <div class="section" id="referralsSection">
+            <div class="card">
+                <h4>Create Custom Referral Code</h4>
+                <div style="display:grid; gap:12px;">
+                    <div>
+                        <label>Select User</label>
+                        <select id="referralUser">
+                            <option value="">Choose user...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Custom Referral Code</label>
+                        <input type="text" id="customReferralCode" placeholder="e.g., GLAMVIP123">
+                    </div>
+                    <button class="btn" onclick="createCustomReferral()">Create Referral Code</button>
+                </div>
+                <div id="referralMsg"></div>
+            </div>
+            
+            <div class="card">
+                <h4>All Users & Referral Codes</h4>
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Phone</th>
+                                <th>Referral Code</th>
+                                <th>Earnings</th>
+                                <th>Referred</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="referralTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
