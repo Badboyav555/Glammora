@@ -69,11 +69,19 @@ async function loadDashboard() {
 var allOrders = [];
 var filteredOrders = [];
 
-async function loadOrders() {
+/*async function loadOrders() {
     var res = await supabase.from('orders').select('*').order('created_at', { ascending: false });
     allOrders = res.data || [];
     filteredOrders = allOrders;
     renderOrdersTable(filteredOrders);
+}*/ async function loadOrders() {
+    var res = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+    allOrders = res.data || [];
+    filteredOrders = allOrders;
+    renderOrdersTable(filteredOrders);
+    
+    // Update count
+    document.getElementById('totalOrders').textContent = allOrders.length;
 }
 
 function filterOrders() {
