@@ -133,6 +133,7 @@
         <button class="tab" onclick="showSection('users')">Users</button>
         <button class="tab" onclick="showSection('products')">Products</button>
         <button class="tab" onclick="showSection('generatelinks')">Generate Links</button>
+        <button class="tab" onclick="showSection('payments')">Payments</button>
     </div>
     
     <div class="content">
@@ -209,6 +210,18 @@
                 </div>
             </div>
         </div>
+        <!-- Payment Verification -->
+<div class="section" id="paymentsSection">
+    <div class="card">
+        <h4>Payment Verification</h4>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead><tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Transaction ID</th><th>Screenshot</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody id="paymentsTable"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
         
         <!-- Generate Links -->
         <div class="section" id="generatelinksSection">
