@@ -77,6 +77,7 @@ function showSection(section) {
     if (section === 'users') loadUsers();
     if (section === 'products') loadProducts();
     if (section === 'generatelinks') loadGeneratedLinks();
+    if (section === 'payments') loadPayments();
 }
 
 // ============ DASHBOARD ============
