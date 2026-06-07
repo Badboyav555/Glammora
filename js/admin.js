@@ -1,4 +1,47 @@
 // Admin Dashboard Functions
+async function loadPayments() {
+    var res = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+    var orders = res.data || [];
+    var html = '';
+    
+    orders.forEach(function(o) {
+        var addr = o.full_address || {};
+        html += '<tr>';
+        html += '<td>#' + String(o.id).slice(-6) + '</td>';
+        html += '<td>' + (addr.fullName || 'N/A') + '<br><small>' + (addr.phone || '') + '</small></td>';
+        html += '<td>Rs. ' + (o.total_amount || 0).toLocaleString() + '</td>';
+        html += '<td style="color:#ff4d8d;">' + (o.transaction_id || 'N/A') + '</td>';
+        html += '<td>' + (o.screenshot_url ? '<a href="' + o.screenshot_url + '" target="_blank"><img src="' + o.screenshot_url + '" style="width:50px;height:50px;object-fit:cover;border-radius:4px;"></a>' : 'No screenshot') + '</td>';
+        html += '<td><span style="color:' + (o.payment_status === 'Verified' ? '#4caf50' : o.payment_status === 'Rejected' ? '#f44336' : '#ff9800') + ';">' + (o.payment_status || 'Pending') + '</span></td>';
+        html += '<td>';
+        if (o.payment_status === 'Pending Verification') {
+            html += '<button onclick="verifyPayment(' + o.id + ')" class="btn-green btn-sm">Verify</button> ';
+            html += '<button onclick="rejectPayment(' + o.id + ')" class="btn-red btn-sm">Reject</button>';
+        }
+        html += '</td>';
+        html += '</tr>';
+    });
+    
+    document.getElementById('paymentsTable').innerHTML = html || '<tr><td colspan="7">No payments</td></tr>';
+}
+
+async function verifyPayment(orderId) {
+    if (!confirm('Verify this payment?')) return;
+    await supabase.from('orders').update({ payment_status: 'Verified', status: 'Confirmed' }).eq('id', orderId);
+    alert('Payment verified!');
+    loadPayments();
+    loadDashboard();
+}
+
+async function rejectPayment(orderId) {
+    if (!confirm('Reject this payment?')) return;
+    await supabase.from('orders').update({ payment_status: 'Rejected' }).eq('id', orderId);
+    alert('Payment rejected!');
+    loadPayments();
+}
+
+// showSection mein add karo
+if (section === 'payments') loadPayments();
 function checkAdmin() {
     if (!localStorage.getItem('glammora_admin')) {
         var pass = prompt('Enter admin password:');
