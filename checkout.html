@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Checkout - Glammora</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #0f0f12;
+            --bg-card: #1a1a22;
+            --pink-primary: #d81b60;
+            --pink-accent: #ff4d8d;
+            --text-primary: #ffffff;
+            --text-secondary: #aaaaaa;
+            --gradient-primary: linear-gradient(135deg, #d81b60, #ff4d8d);
+            --shadow-pink: 0 8px 32px rgba(216, 27, 96, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding-bottom: 100px;
+        }
+
+        .checkout-page {
+            padding: 16px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .checkout-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 20px; position: sticky; top: 0;
+            background: var(--bg-primary); padding: 12px 0; z-index: 10;
+        }
+
+        .back-btn {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-primary); font-size: 1.1rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .checkout-title { font-size: 1.3rem; font-weight: 700; }
+
+        .section-card {
+            background: var(--bg-card); border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.08); padding: 16px; margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: 1rem; font-weight: 600; margin-bottom: 14px;
+            display: flex; align-items: center; gap: 8px; color: var(--pink-accent);
+        }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        .form-group { display: flex; flex-direction: column; margin-bottom: 10px; }
+        .form-group label { font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 4px; }
+        .form-group .required { color: var(--pink-accent); }
+
+        .form-input {
+            width: 100%; padding: 10px 12px; background: #0f0f12;
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+            color: var(--text-primary); font-size: 0.9rem; outline: none;
+            font-family: inherit;
+        }
+        .form-input:focus { border-color: var(--pink-primary); }
+        select.form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23aaaaaa' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
+        }
+
+        /* QR Section */
+        .qr-card {
+            text-align: center; padding: 24px 16px;
+        }
+        .qr-image {
+            width: 200px; height: 200px; margin: 0 auto 16px;
+            background: white; border-radius: 16px; padding: 12px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .qr-image img { width: 100%; height: 100%; object-fit: contain; }
+        
+        .upi-id-box {
+            background: #0f0f12; padding: 12px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: space-between;
+            margin: 8px 0;
+        }
+        .upi-id-box code { color: var(--pink-accent); font-size: 1rem; font-weight: 600; }
+        .copy-btn {
+            background: var(--pink-primary); color: white; border: none;
+            padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600;
+        }
+        
+        .amount-display {
+            font-size: 2rem; font-weight: 800; color: var(--pink-accent);
+            margin: 12px 0; text-align: center;
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed rgba(255,255,255,0.2); border-radius: 12px;
+            padding: 24px; text-align: center; cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-area:hover { border-color: var(--pink-primary); background: rgba(216,27,96,0.05); }
+        .upload-area i { font-size: 2rem; color: var(--text-secondary); margin-bottom: 8px; }
+        .upload-area p { font-size: 0.85rem; color: var(--text-secondary); }
+        .preview-img { max-width: 100%; max-height: 200px; border-radius: 8px; margin-top: 8px; }
+
+        .place-order-btn {
+            width: 100%; padding: 16px; background: var(--gradient-primary);
+            border: none; border-radius: 50px; color: white; font-weight: 700;
+            font-size: 1rem; cursor: pointer; box-shadow: var(--shadow-pink);
+            margin-top: 16px;
+        }
+        .place-order-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .toast {
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+            background: var(--bg-card); color: white; padding: 12px 24px;
+            border-radius: 50px; font-weight: 500; border: 1px solid var(--pink-primary);
+            z-index: 100; font-size: 0.85rem; white-space: nowrap;
+        }
+
+        .payment-steps {
+            display: flex; gap: 8px; margin-bottom: 20px;
+        }
+        .step {
+            flex: 1; text-align: center; padding: 8px; border-radius: 8px;
+            font-size: 0.7rem; font-weight: 600; background: #0f0f12; color: var(--text-secondary);
+        }
+        .step.active { background: var(--pink-primary); color: white; }
+        .step.done { background: #4caf50; color: white; }
+
+        @media (max-width: 360px) {
+            .form-row { grid-template-columns: 1fr; }
+            .qr-image { width: 160px; height: 160px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="checkout-page">
+        <div class="checkout-header">
+            <button class="back-btn" onclick="history.back()"><i class="fas fa-arrow-left"></i></button>
+            <h1 class="checkout-title">Checkout</h1>
+        </div>
+
+        <!-- Steps -->
+        <div class="payment-steps">
+            <div class="step active" id="step1">Address</div>
+            <div class="step" id="step2">Payment</div>
+            <div class="step" id="step3">Confirm</div>
+        </div>
+
+        <!-- Step 1: Address -->
+        <div id="addressStep">
+            <div class="section-card">
+                <div class="section-title"><i class="fas fa-map-marker-alt"></i> Delivery Address</div>
+                <form id="addressForm">
+                    <div class="form-group"><label>Full Name <span class="required">*</span></label><input type="text" class="form-input" name="fullName" placeholder="Enter full name" required></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Phone <span class="required">*</span></label><input type="tel" class="form-input" name="phone" placeholder="10-digit" maxlength="10" required></div>
+                        <div class="form-group"><label>Alt Phone</label><input type="tel" class="form-input" name="alternatePhone" placeholder="Optional" maxlength="10"></div>
+                    </div>
+                    <div class="form-group"><label>House/Flat/Building <span class="required">*</span></label><input type="text" class="form-input" name="address" placeholder="House no., building" required></div>
+                    <div class="form-group"><label>Area/Street <span class="required">*</span></label><input type="text" class="form-input" name="area" placeholder="Area or street" required></div>
+                    <div class="form-group"><label>Landmark</label><input type="text" class="form-input" name="landmark" placeholder="Nearby landmark"></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>City <span class="required">*</span></label><input type="text" class="form-input" name="city" placeholder="City" required></div>
+                        <div class="form-group"><label>State <span class="required">*</span></label>
+                            <select class="form-input" name="state" required>
+                                <option value="">Select</option>
+                                <option>Andhra Pradesh</option><option>Assam</option><option>Bihar</option><option>Chhattisgarh</option><option>Delhi</option><option>Goa</option><option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option><option>Jharkhand</option><option>Karnataka</option><option>Kerala</option><option>Madhya Pradesh</option><option>Maharashtra</option><option>Odisha</option><option>Punjab</option><option>Rajasthan</option><option>Tamil Nadu</option><option>Telangana</option><option>Uttar Pradesh</option><option>Uttarakhand</option><option>West Bengal</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Pincode <span class="required">*</span></label><input type="text" class="form-input" name="pincode" placeholder="6-digit" maxlength="6" required></div>
+                        <div class="form-group"><label>Country</label><input type="text" class="form-input" value="India" readonly></div>
+                    </div>
+                    <button type="button" class="place-order-btn" onclick="goToPayment()">Continue to Payment</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Step 2: Payment -->
+        <div id="paymentStep" style="display:none;">
+            <div class="section-card qr-card">
+                <div class="section-title"><i class="fas fa-qrcode"></i> Scan & Pay</div>
+                
+                <!-- QR Code -->
+                <div class="qr-image">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=glammora@upi&pn=GLAMMORA&am=TOTALAMOUNT" alt="UPI QR Code" id="qrCode">
+                </div>
+                
+                <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px;">Scan using any UPI app</p>
+                
+                <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;">
+                    <span style="background:#0f0f12;padding:6px 12px;border-radius:20px;font-size:0.75rem;">Google Pay</span>
+                    <span style="background:#0f0f12;padding:6px 12px;border-radius:20px;font-size:0.75rem;">PhonePe</span>
+                    <span style="background:#0f0f12;padding:6px 12px;border-radius:20px;font-size:0.75rem;">Paytm</span>
+                </div>
+
+                <!-- UPI ID -->
+                <div class="upi-id-box">
+                    <span style="font-size:0.85rem;">UPI ID:</span>
+                    <code>glammora@upi</code>
+                    <button class="copy-btn" onclick="copyUPI()"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+
+                <p style="font-size:0.8rem;color:var(--text-secondary);">Account: GLAMMORA STORE</p>
+                
+                <div class="amount-display" id="paymentAmount">Rs. 0</div>
+                <p style="font-size:0.8rem;color:#4caf50;">Amount to Pay</p>
+            </div>
+
+            <div class="section-card">
+                <div class="section-title"><i class="fas fa-upload"></i> Payment Proof</div>
+                
+                <div class="form-group">
+                    <label>Transaction ID / UTR Number <span class="required">*</span></label>
+                    <input type="text" class="form-input" id="transactionId" placeholder="Enter UPI transaction ID">
+                </div>
+                
+                <div class="form-group" style="margin-top:12px;">
+                    <label>Payment Screenshot (Optional)</label>
+                    <div class="upload-area" onclick="document.getElementById('screenshotInput').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Tap to upload screenshot</p>
+                        <p style="font-size:0.7rem;">JPG, PNG, WEBP</p>
+                        <img id="screenshotPreview" class="preview-img" style="display:none;">
+                    </div>
+                    <input type="file" id="screenshotInput" accept="image/*" style="display:none;" onchange="previewScreenshot(event)">
+                </div>
+                
+                <button class="place-order-btn" onclick="submitOrder()">
+                    <i class="fas fa-check-circle"></i> Submit Order
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 3: Confirm -->
+        <div id="confirmStep" style="display:none;text-align:center;padding:40px 20px;">
+            <i class="fas fa-check-circle" style="font-size:4rem;color:#4caf50;display:block;margin-bottom:16px;"></i>
+            <h3>Order Submitted!</h3>
+            <p style="color:var(--text-secondary);margin:12px 0;">Your payment is pending verification.</p>
+            <button class="place-order-btn" onclick="window.location.href='profile.html'">View Orders</button>
+            <button class="place-order-btn" style="background:transparent;border:2px solid var(--pink-primary);color:var(--pink-accent);margin-top:8px;" onclick="window.location.href='index.html'">Continue Shopping</button>
+        </div>
+    </div>
+
+    <div id="toastContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script>
+        var currentStep = 1;
+        var totalAmount = 0;
+        var screenshotFile = null;
+        var addressData = {};
+
+        function getUser() {
+            var u = localStorage.getItem('glammora_user');
+            return u ? JSON.parse(u) : null;
+        }
+
+        function showToast(msg, type) {
+            var t = document.createElement('div');
+            t.className = 'toast';
+            t.style.background = type === 'error' ? '#f44336dd' : '#1a1a22';
+            t.textContent = msg;
+            document.getElementById('toastContainer').appendChild(t);
+            setTimeout(function() { t.remove(); }, 2500);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!getUser()) { window.location.href = 'login.html?redirect=checkout.html'; return; }
+            calculateTotal();
+            loadSavedAddress();
+        });
+
+        function calculateTotal() {
+            var cart = JSON.parse(localStorage.getItem('glammora_cart') || '[]');
+            var subtotal = 0;
+            cart.forEach(function(item) { subtotal += (item.discounted_price * (item.quantity || 1)); });
+            var delivery = subtotal > 999 ? 0 : 99;
+            totalAmount = subtotal + delivery;
+            document.getElementById('paymentAmount').textContent = 'Rs. ' + totalAmount.toLocaleString();
+            
+            // Update QR code
+            var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=glammora@upi&pn=GLAMMORA&am=' + totalAmount + '&cu=INR';
+            document.getElementById('qrCode').src = qrUrl;
+        }
+
+        async function loadSavedAddress() {
+            var user = getUser();
+            if (!user) return;
+            var res = await supabase.from('addresses').select('*').eq('user_id', user.id).eq('is_default', true).maybeSingle();
+            if (res.data) {
+                var a = res.data;
+                document.querySelector('[name="fullName"]').value = a.full_name || '';
+                document.querySelector('[name="phone"]').value = a.phone || '';
+                document.querySelector('[name="alternatePhone"]').value = a.alternate_phone || '';
+                document.querySelector('[name="address"]').value = a.address || '';
+                document.querySelector('[name="area"]').value = a.area || '';
+                document.querySelector('[name="landmark"]').value = a.landmark || '';
+                document.querySelector('[name="city"]').value = a.city || '';
+                document.querySelector('[name="state"]').value = a.state || '';
+                document.querySelector('[name="pincode"]').value = a.pincode || '';
+            }
+        }
+
+        function copyUPI() {
+            navigator.clipboard.writeText('glammora@upi').then(function() {
+                showToast('UPI ID copied!');
+            });
+        }
+
+        function previewScreenshot(event) {
+            var file = event.target.files[0];
+            if (!file) return;
+            screenshotFile = file;
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var preview = document.getElementById('screenshotPreview');
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function goToPayment() {
+            var fullName = document.querySelector('[name="fullName"]').value.trim();
+            var phone = document.querySelector('[name="phone"]').value.trim();
+            var address = document.querySelector('[name="address"]').value.trim();
+            var area = document.querySelector('[name="area"]').value.trim();
+            var city = document.querySelector('[name="city"]').value.trim();
+            var state = document.querySelector('[name="state"]').value;
+            var pincode = document.querySelector('[name="pincode"]').value.trim();
+
+            if (!fullName || !phone || !address || !area || !city || !state || !pincode) {
+                showToast('Fill all required fields', 'error'); return;
+            }
+            if (phone.length !== 10 || isNaN(phone)) { showToast('Enter valid phone', 'error'); return; }
+            if (pincode.length !== 6 || isNaN(pincode)) { showToast('Enter valid pincode', 'error'); return; }
+
+            addressData = {
+                fullName: fullName,
+                phone: phone,
+                alternatePhone: document.querySelector('[name="alternatePhone"]').value.trim(),
+                address: address,
+                area: area,
+                landmark: document.querySelector('[name="landmark"]').value.trim(),
+                city: city,
+                state: state,
+                pincode: pincode,
+                country: 'India'
+            };
+
+            currentStep = 2;
+            document.getElementById('addressStep').style.display = 'none';
+            document.getElementById('paymentStep').style.display = 'block';
+            document.getElementById('confirmStep').style.display = 'none';
+            
+            document.getElementById('step1').classList.add('done');
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.add('active');
+            
+            window.scrollTo(0, 0);
+        }
+
+        async function submitOrder() {
+            var transactionId = document.getElementById('transactionId').value.trim();
+            
+            if (!transactionId) {
+                showToast('Enter transaction ID', 'error'); return;
+            }
+
+            var btn = document.querySelector('#paymentStep .place-order-btn');
+            btn.textContent = 'Submitting...'; btn.disabled = true;
+
+            var user = getUser();
+            var cart = JSON.parse(localStorage.getItem('glammora_cart') || '[]');
+            var subtotal = 0;
+            cart.forEach(function(item) { subtotal += (item.discounted_price * (item.quantity || 1)); });
+            var delivery = subtotal > 999 ? 0 : 99;
+
+            var screenshotUrl = null;
+
+            // Upload screenshot if exists
+            if (screenshotFile) {
+                var fileName = 'payment_' + Date.now() + '_' + user.id;
+                var uploadResult = await supabase.storage.from('payment-screenshots').upload(fileName, screenshotFile);
+                if (!uploadResult.error) {
+                    var urlResult = supabase.storage.from('payment-screenshots').getPublicUrl(fileName);
+                    screenshotUrl = urlResult.data.publicUrl;
+                }
+            }
+
+            try {
+                var result = await supabase.from('orders').insert({
+                    user_id: user.id,
+                    user_phone: user.phone,
+                    full_address: addressData,
+                    items: cart,
+                    subtotal: subtotal,
+                    delivery_charge: delivery,
+                    total_amount: totalAmount,
+                    referral_code: localStorage.getItem('glammora_ref') || null,
+                    transaction_id: transactionId,
+                    screenshot_url: screenshotUrl,
+                    payment_status: 'Pending Verification',
+                    payment_method: 'UPI',
+                    status: 'Pending',
+                    created_at: new Date().toISOString()
+                }).select().single();
+
+                if (result.error) {
+                    showToast('Failed: ' + result.error.message, 'error');
+                    btn.textContent = 'Submit Order'; btn.disabled = false;
+                    return;
+                }
+
+                // Save address
+                var addrData = {
+                    user_id: user.id, full_name: addressData.fullName, phone: addressData.phone,
+                    alternate_phone: addressData.alternatePhone, address: addressData.address,
+                    area: addressData.area, landmark: addressData.landmark, city: addressData.city,
+                    state: addressData.state, pincode: addressData.pincode, country: 'India', is_default: true
+                };
+                var existingAddr = await supabase.from('addresses').select('id').eq('user_id', user.id).maybeSingle();
+                if (existingAddr.data) {
+                    await supabase.from('addresses').update(addrData).eq('user_id', user.id);
+                } else {
+                    await supabase.from('addresses').insert(addrData);
+                }
+
+                localStorage.removeItem('glammora_cart');
+                localStorage.removeItem('glammora_ref');
+
+                currentStep = 3;
+                document.getElementById('addressStep').style.display = 'none';
+                document.getElementById('paymentStep').style.display = 'none';
+                document.getElementById('confirmStep').style.display = 'block';
+                document.getElementById('step2').classList.add('done');
+                document.getElementById('step2').classList.remove('active');
+                document.getElementById('step3').classList.add('active');
+
+            } catch(e) {
+                showToast('Error. Try again.', 'error');
+                btn.textContent = 'Submit Order'; btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
